@@ -33,7 +33,9 @@ jobs:
         run: npm run build --workspace=browser-app
 
       - name: Build electron-app
-        run: npm run build --workspace=electron-app
+        run: |
+          export NODE_OPTIONS=--max_old_space_size=4096
+          npm run build --workspace=electron-app
 
       - name: Package AppImage
         run: npm run package --workspace=electron-app
@@ -79,7 +81,9 @@ jobs:
         run: npm run build --workspace=browser-app
 
       - name: Build electron-app
-        run: npm run build --workspace=electron-app
+        run: |
+          export NODE_OPTIONS=--max_old_space_size=4096
+          npm run build --workspace=electron-app
 
       - name: Package macOS (DMG + ZIP)
         run: npm run package --workspace=electron-app
@@ -115,6 +119,13 @@ jobs:
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean npm cache and reinstall (Windows)
+        run: |
+          Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue
+          npm cache clean --force
+          npm install
+        shell: pwsh
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
