@@ -5,5 +5,17 @@ lib
 *-app/*
 !*-app/package.json
 dist/
+# Keep a lightweight plugins/ folder in the repo but ignore large/binary plugin files
+# Allow the folder itself and small metadata files, but ignore heavy assets
 plugins/
+!plugins/
+plugins/*.vsix
+plugins/**/*.vsix
+plugins/**/node_modules/
+plugins/**/*.tgz
+!plugins/.gitkeep
+!plugins/README.md
+
+# Ensure scripts folder is not ignored so helper scripts can be committed
+!electron-app/scripts/
 *.AppImage

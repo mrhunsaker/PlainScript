@@ -1,0 +1,40 @@
+import { access, mkdir, cp, writeFile } from 'fs/promises';
+import { constants } from 'fs';
+import path from 'path';
+
+const rootPlugins = path.resolve(process.cwd(), '..', 'plugins');
+const destPlugins = path.resolve(process.cwd(), 'plugins');
+
+async function exists(p) {
+  try {
+    await access(p, constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+(async () => {
+  try {
+    const srcExists = await exists(rootPlugins);
+    if (srcExists) {
+      await mkdir(destPlugins, { recursive: true });
+      await cp(rootPlugins, destPlugins, { recursive: true, force: true });
+      console.log(`Copied plugins from ${rootPlugins} to ${destPlugins}`);
+      process.exit(0);
+    }
+
+    // No root plugins folder — ensure an empty plugins folder is present
+    await mkdir(destPlugins, { recursive: true });
+    const placeholder = path.join(destPlugins, 'README.md');
+    await writeFile(placeholder, `# Plugins
+
+  No plugins were found in the repository root. Place VSIX files or plugin folders here to include them in the build.
+  `);
+    console.warn(`No root plugins folder found at ${rootPlugins}. Created empty ${destPlugins}`);
+    process.exit(0);
+  } catch (err) {
+    console.error('prepare-plugins failed:', err && err.message ? err.message : err);
+    process.exit(1);
+  }
+})();
