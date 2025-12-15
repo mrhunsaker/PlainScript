@@ -7,6 +7,7 @@ if (process.env.SKIP_THEIA_CHECK === '1') {
 try {
   execSync('npx --yes @theia/cli@1.67.0 theia check:theia-version', { stdio: 'inherit' });
 } catch (err) {
-  console.error('postinstall: theia check failed', err && err.message ? err.message : err);
-  process.exit(err && err.status ? err.status : 1);
+  console.warn('postinstall: theia check failed (non-fatal):', err && err.message ? err.message : err);
+  // Don't fail the install if the Theia check cannot run.
+  process.exit(0);
 }

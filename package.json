@@ -19,7 +19,10 @@
   ],
   "packageManager": "npm@11.0.0",
   "dependencies": {
-    "@vscode/ripgrep": "13.0.0"
+    "@vscode/ripgrep": "^1.17.0"
+  },
+  "overrides": {
+    "@vscode/ripgrep": "^1.17.0"
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {

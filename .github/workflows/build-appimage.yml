@@ -111,7 +111,7 @@ jobs:
           node-version: '20'
 
       - name: Clean install
-        run: $env:SKIP_THEIA_CHECK='1'; npm ci
+        run: $env:SKIP_THEIA_CHECK='1'; npm ci --no-optional
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
