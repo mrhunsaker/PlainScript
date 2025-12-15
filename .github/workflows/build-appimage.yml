@@ -69,6 +69,8 @@ jobs:
 
       - name: Clean install
         run: SKIP_THEIA_CHECK=1 npm ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui

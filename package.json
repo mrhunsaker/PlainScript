@@ -8,7 +8,7 @@
     "build": "turbo run build",
     "start": "turbo start",
     "watch": "turbo run watch",
-    "postinstall": "if [ \"$SKIP_THEIA_CHECK\" = \"1\" ]; then exit 0; else npx --yes @theia/cli@1.67.0 theia check:theia-version; fi",
+    "postinstall": "node ./scripts/postinstall.js",
     "clean": "turbo run clean && rimraf node_modules",
     "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false"
   },
@@ -18,6 +18,9 @@
     "electron-app"
   ],
   "packageManager": "npm@11.0.0",
+  "dependencies": {
+    "@vscode/ripgrep": "13.0.0"
+  },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
     "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.95.3/file/eclipse-theia.builtin-extension-pack-1.95.3.vsix",
@@ -34,5 +37,7 @@
     "copy-webpack-plugin": "13.0.0",
     "yargs": "17",
     "@types/yargs": "17"
+    ,"cross-env": "^7.0.3",
+    "shx": "^0.3.4"
   }
 }
