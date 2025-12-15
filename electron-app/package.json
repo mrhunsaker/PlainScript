@@ -1,0 +1,113 @@
+{
+  "private": true,
+  "name": "electron-app",
+  "version": "1.0.0-beta",
+  "description": "PlainScript - Minimal Theia-based code and text editor",
+  "author": "Michael Ryan Hunsaker, M.Ed., Ph.D. <hunsakerconsulting@gmail.com>",
+  "main": "lib/backend/electron-main.js",
+  "dependencies": {
+    "@theia/core": "1.67.0",
+    "@theia/editor": "1.67.0",
+    "@theia/electron": "1.67.0",
+    "@theia/filesystem": "1.67.0",
+    "@theia/markers": "1.67.0",
+    "@theia/messages": "1.67.0",
+    "@theia/monaco": "1.67.0",
+    "@theia/navigator": "1.67.0",
+    "@theia/plugin": "1.67.0",
+    "@theia/plugin-ext": "1.67.0",
+    "@theia/plugin-ext-vscode": "1.67.0",
+    "@theia/preferences": "1.67.0",
+    "@theia/process": "1.67.0",
+    "@theia/terminal": "1.67.0",
+    "@theia/workspace": "1.67.0",
+
+    "custom-ui": "0.0.0"
+  },
+  "devDependencies": {
+    "@theia/cli": "1.67.0",
+    "electron": "38.4.0",
+    "electron-builder": "^24.13.3"
+  },
+  "scripts": {
+    "build": "npm run rebuild && npx theia build --mode production",
+    "bundle": "npm run rebuild && npx theia build --mode development",
+    "prepare:plugins": "node ./scripts/prepare-plugins.mjs",
+    "package": "npm run build && npm run prepare:plugins && npx electron-builder",
+    "rebuild": "npx theia rebuild:electron --cacheRoot ..",
+    "start": "npx theia start --plugins=local-dir:plugins",
+    "watch": "npm run rebuild && npx theia build --watch --mode development"
+  },
+  "theia": {
+    "target": "electron",
+    "frontend": {
+      "config": {
+        "applicationName": "PlainScript",
+        "reloadOnReconnect": true,
+        "preferences": {
+          "workbench.iconTheme": "Catppuccin VSC Icons - Latte",
+          "workbench.colorTheme": "Alabaster",
+          "security.workspace.trust.enabled": false,
+          "security.workspace.trust.startupPrompt": "never",
+          "security.workspace.trust.emptyWindowTrust": "trusted",
+          "extensions.ignoreRecommendations": true,
+          "extensions.verifySignature": false,
+          "indentRainbow.includedLanguages": ["*"],
+          "indentRainbow.excludedLanguages": [],
+          "indentRainbow.ignoreErrorLanguages": []
+        }
+      }
+    },
+    "backend": {
+      "config": {
+        "resolveSystemPlugins": false,
+        "configurationFolder": ".theia-ide"
+      }
+    },
+    "generator": {
+      "config": {
+        "preloadTemplate": "./resources/preload.html"
+      }
+    }
+  },
+  "build": {
+    "appId": "com.plainscript.app",
+    "productName": "PlainScript",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "npmRebuild": false,
+    "buildDependenciesFromSource": false,
+    "files": [
+      "lib/**",
+      "src-gen/**",
+      "resources/**",
+      "plugins/**",
+      "product.json",
+      "package.json",
+      "!**/*.map",
+      "!node_modules/@msgpackr-extract/msgpackr-extract-darwin-*",
+      "!node_modules/@msgpackr-extract/**/msgpackr-extract-darwin-*",
+      "!node_modules/@parcel/watcher/build/darwin*",
+      "!node_modules/drivelist/build/darwin*",
+      "!node_modules/keytar/build/darwin*",
+      "!node_modules/native-keymap/build/darwin*",
+      "!node_modules/node-pty/build/darwin*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "resources/icons/plainscript.png",
+      "category": "Development"
+    },
+    "appImage": {
+      "artifactName": "PlainScript-${version}-x86_64.AppImage"
+    }
+  }
+}

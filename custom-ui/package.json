@@ -1,0 +1,40 @@
+{
+  "name": "custom-ui",
+  "keywords": [
+    "theia-extension"
+  ],
+  "version": "0.0.0",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "dependencies": {
+    "@theia/core": "1.67.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "@theia/filesystem": "1.67.0",
+    "@theia/navigator": "1.67.0",
+    "@theia/output": "1.67.0",
+    "@theia/search-in-workspace": "1.67.0",
+    "@theia/terminal": "1.67.0",
+    "@theia/test": "1.67.0",
+    "@theia/workspace": "1.67.0",
+    "rimraf": "^5.0.0",
+    "typescript": "~5.4.5",
+    "vite": "^7.2.7",
+    "vite-plugin-lib-inject-css": "^2.2.2"
+  },
+  "scripts": {
+    "clean": "rm -rf lib node_modules",
+    "build": "vite build && npm run dts",
+    "watch": "vite build --watch --clearScreen false",
+    "dev": "npm run watch",
+    "dts": "tsc --emitDeclarationOnly --declaration --outDir lib"
+  },
+  "theiaExtensions": [
+    {
+      "frontend": "lib/frontend/index.js"
+    }
+  ]
+}

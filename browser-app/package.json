@@ -1,0 +1,60 @@
+{
+  "private": true,
+  "name": "browser-app",
+  "version": "0.0.0",
+  "dependencies": {
+    "@theia/core": "1.67.0",
+    "@theia/editor": "1.67.0",
+    "@theia/electron": "1.67.0",
+    "@theia/filesystem": "1.67.0",
+    "@theia/markers": "1.67.0",
+    "@theia/messages": "1.67.0",
+    "@theia/monaco": "1.67.0",
+    "@theia/navigator": "1.67.0",
+    "@theia/plugin": "1.67.0",
+    "@theia/plugin-ext": "1.67.0",
+    "@theia/plugin-ext-vscode": "1.67.0",
+    "@theia/preferences": "1.67.0",
+    "@theia/process": "1.67.0",
+    "@theia/terminal": "1.67.0",
+    "@theia/workspace": "1.67.0",
+    "custom-ui": "0.0.0"
+  },
+  "devDependencies": {
+    "@theia/cli": "1.67.0"
+  },
+  "scripts": {
+    "build": "npm run rebuild && npx theia build --mode production",
+    "bundle": "npm run rebuild && npx theia build --mode development",
+    "rebuild": "npx theia rebuild:browser --cacheRoot ..",
+    "start": "npx theia start --plugins=local-dir:../plugins",
+    "watch": "npm run rebuild && npx theia build --watch --mode development"
+  },
+  "theia": {
+    "target": "browser",
+    "frontend": {
+      "config": {
+        "applicationName": "PlainScript",
+        "reloadOnReconnect": true,
+        "preferences": {
+          "workbench.iconTheme": "Catppuccin VSC Icons - Latte",
+          "workbench.colorTheme": "Alabaster",
+          "security.workspace.trust.enabled": false,
+          "security.workspace.trust.startupPrompt": "never",
+          "security.workspace.trust.emptyWindowTrust": "trusted",
+          "extensions.ignoreRecommendations": true,
+          "extensions.verifySignature": false,
+          "indentRainbow.includedLanguages": ["*"],
+          "indentRainbow.excludedLanguages": [],
+          "indentRainbow.ignoreErrorLanguages": []
+        }
+      }
+    },
+    "generator": {
+      "config": {
+        "preloadTemplate": "./resources/preload.html"
+      }
+    }
+  },
+  "packageManager": "npm@11.0.0"
+}

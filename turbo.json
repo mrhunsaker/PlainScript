@@ -1,0 +1,22 @@
+{
+    "$schema": "<https://turbo.build/schema.json>",
+    "tasks": {
+        "clean": {
+            "outputs": [],
+            "dependsOn": ["^clean"]
+        },
+        "build": {
+            "dependsOn": ["^build"],
+            "outputs": ["lib/**"]
+        },
+        "start": {
+            "dependsOn": ["^build"],
+            "outputs": []
+        },
+        "watch": {
+            "cache": false,
+            "dependsOn": [],
+            "outputs": ["lib/**"]
+        }
+    }
+}
