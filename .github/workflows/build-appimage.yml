@@ -19,10 +19,12 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full
+          sudo apt-get install -y p7zip-full libx11-dev libxkbfile-dev
 
       - name: Clean install
         run: SKIP_THEIA_CHECK=1 npm ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -109,6 +111,8 @@ jobs:
       - name: Clean install
         run: $env:SKIP_THEIA_CHECK='1'; npm ci
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
