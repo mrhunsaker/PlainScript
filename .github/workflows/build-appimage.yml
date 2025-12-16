@@ -10,6 +10,8 @@ env:
   SKIP_THEIA_CHECK: 1
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ELECTRON_DOWNLOAD_MAX_ATTEMPTS: 5
+  ELECTRON_MIRROR: https://github.com/electron/electron/releases/
 
 jobs:
   build-linux:
@@ -28,7 +30,8 @@ jobs:
 
       - name: Clean install
         run: |
-          rm -rf node_modules package-lock.json
+          Remove-Item -Force -Recurse node_modules -ErrorAction SilentlyContinue
+          if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
           npm install
 
       - name: Build custom-ui
@@ -77,6 +80,7 @@ jobs:
       - name: Clean install
         run: |
           rm -rf node_modules package-lock.json
+          npm config set fetch-retry-maxtimeout 120000
           npm install
 
       - name: Build custom-ui

@@ -12,6 +12,10 @@
     "clean": "turbo run clean && rimraf node_modules",
     "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false"
   },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/mrhunsaker/PlainScript.git"
+    },
   "workspaces": [
     "browser-app",
     "custom-ui",
