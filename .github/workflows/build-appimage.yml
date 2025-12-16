@@ -7,11 +7,21 @@ on:
   workflow_dispatch:
 
 env:
+      - name: Prefetch Electron to warm cache (macOS)
+        run: |
+          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-retries 5
+          npm config set electron_mirror https://github.com/electron/electron/releases/
+          npm install electron@38.4.0 --no-audit --prefer-offline || true
   SKIP_THEIA_CHECK: 1
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ELECTRON_DOWNLOAD_MAX_ATTEMPTS: 5
+          npm config set fetch-retries 5
+          npm config set electron_mirror https://github.com/electron/electron/releases/
   ELECTRON_MIRROR: https://github.com/electron/electron/releases/
+  ELECTRON_BUILD_DOWNLOAD_TIMEOUT: 120000
+  ELECTRON_BUILD_DOWNLOAD_RETRY: 5
 
 jobs:
   build-linux:
@@ -22,6 +32,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Prefetch Electron to warm cache (Linux)
+        run: |
+          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-retries 5
+          npm config set electron_mirror https://github.com/electron/electron/releases/
+          npm install electron@38.4.0 --no-audit --prefer-offline || true
 
       - name: Install system dependencies
         run: |
