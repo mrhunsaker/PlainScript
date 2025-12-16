@@ -91,38 +91,42 @@ jobs:
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
-        build-windows:
-          runs-on: windows-latest
-          steps:
-            - uses: actions/checkout@v4
+        with:
+          name: plainscript-macos
+          path: electron-app/dist/*.{dmg,zip}
+          retention-days: 30
 
-            - uses: actions/setup-python@v4
-              with:
-                python-version: '3.11'
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: electron-app/dist/*.{dmg,zip}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - uses: actions/setup-node@v4
-              with:
-                node-version: '20'
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Clean install
-              run: npm ci --no-optional
-              shell: pwsh
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-            - name: Clean npm cache and reinstall (Windows)
-              run: |
-                Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue
-                npm cache clean --force
-                npm install
-              shell: pwsh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-            - name: Build custom-ui
-              run: npm run build --workspace=custom-ui
+      - name: Clean install
+        run: npm ci --no-optional
+        shell: pwsh
 
-            - name: Build browser-app
-              run: npm run build --workspace=browser-app
-
-            - name: Build electron-app
-              run: npm run build --workspace=electron-app
+      - name: Clean npm cache and reinstall (Windows)
+        run: |
+          Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue
+          npm cache clean --force
           npm install
         shell: pwsh
 
