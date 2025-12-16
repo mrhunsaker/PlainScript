@@ -24,10 +24,12 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full build-essential python3 libsecret-1-dev
+          sudo apt-get install -y p7zip-full build-essential python3 libsecret-1-dev libx11-dev libxkbfile-dev
 
       - name: Clean install
-        run: npm ci
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -73,7 +75,9 @@ jobs:
           node-version: '20'
 
       - name: Clean install
-        run: npm ci
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -119,14 +123,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Clean install
-        run: npm ci --no-optional
-        shell: pwsh
-
-      - name: Clean npm cache and reinstall (Windows)
+      - name: Clean install and rebuild
         run: |
-          Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue
-          npm cache clean --force
+          rm -rf node_modules package-lock.json
           npm install
         shell: pwsh
 
