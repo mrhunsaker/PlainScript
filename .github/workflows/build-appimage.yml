@@ -15,23 +15,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full
+          sudo apt-get install -y p7zip-full build-essential python3 libsecret-1-dev libkeytar0
 
       - name: Clean install
-        run: SKIP_THEIA_CHECK=1 npm ci
+        run: npm ci
 
-      - name: Build custom-ui
-        run: npm run build --workspace=custom-ui
-
-      - name: Build browser-app
-        run: npm run build --workspace=browser-app
-
-      - name: Build electron-app
-        run: npm run build --workspace=electron-app
+      - name: Build all workspaces
+        run: npm run build
 
       - name: Package AppImage
         run: npm run package --workspace=electron-app
@@ -64,18 +59,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+
+      - name: Install build tools
+        run: |
+          brew install python3 libsecret
 
       - name: Clean install
-        run: SKIP_THEIA_CHECK=1 npm ci
+        run: npm ci
 
-      - name: Build custom-ui
-        run: npm run build --workspace=custom-ui
-
-      - name: Build browser-app
-        run: npm run build --workspace=browser-app
-
-      - name: Build electron-app
-        run: npm run build --workspace=electron-app
+      - name: Build all workspaces
+        run: npm run build
 
       - name: Package macOS (DMG + ZIP)
         run: npm run package --workspace=electron-app
@@ -102,22 +96,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Clean install
-        run: $env:SKIP_THEIA_CHECK='1'; npm ci
-        shell: pwsh
+        run: npm ci
 
-      - name: Build custom-ui
-        run: npm run build --workspace=custom-ui
-
-      - name: Build browser-app
-        run: npm run build --workspace=browser-app
-
-      - name: Build electron-app
-        run: npm run build --workspace=electron-app
+      - name: Build all workspaces
+        run: npm run build
 
       - name: Package Windows (NSIS + Portable)
         run: npm run package --workspace=electron-app

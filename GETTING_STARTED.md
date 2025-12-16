@@ -36,6 +36,8 @@ npm install
 
 This downloads all required packages for both browser and Electron versions.
 
+**Note**: The postinstall script now gracefully handles Theia version checking even during initial setup, so this command should complete successfully even in environments without all build tools available.
+
 ### 4. Download Plugins
 
 ```bash

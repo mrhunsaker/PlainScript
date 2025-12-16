@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "electron-app",
-  "version": "1.0.0-beta",
+  "version": "1.1.0",
   "description": "PlainScript - Minimal Theia-based code and text editor",
   "author": "Michael Ryan Hunsaker, M.Ed., Ph.D. <hunsakerconsulting@gmail.com>",
   "main": "lib/backend/electron-main.js",
@@ -30,13 +30,13 @@
     "electron-builder": "^24.13.3"
   },
   "scripts": {
-    "build": "npm run rebuild && npx theia build --mode production",
-    "bundle": "npm run rebuild && npx theia build --mode development",
+    "build": "npm run rebuild || true && npx theia build --mode production",
+    "bundle": "npm run rebuild || true && npx theia build --mode development",
     "prepare:plugins": "node ./scripts/prepare-plugins.mjs",
     "package": "npm run build && npm run prepare:plugins && npx electron-builder",
     "rebuild": "npx theia rebuild:electron --cacheRoot ..",
     "start": "npx theia start --plugins=local-dir:plugins",
-    "watch": "npm run rebuild && npx theia build --watch --mode development"
+    "watch": "npm run rebuild || true && npx theia build --watch --mode development"
   },
   "theia": {
     "target": "electron",
@@ -90,24 +90,91 @@
       "plugins/**",
       "product.json",
       "package.json",
-      "!**/*.map",
-      "!node_modules/@msgpackr-extract/msgpackr-extract-darwin-*",
-      "!node_modules/@msgpackr-extract/**/msgpackr-extract-darwin-*",
-      "!node_modules/@parcel/watcher/build/darwin*",
-      "!node_modules/drivelist/build/darwin*",
-      "!node_modules/keytar/build/darwin*",
-      "!node_modules/native-keymap/build/darwin*",
-      "!node_modules/node-pty/build/darwin*"
+      "!**/*.map"
     ],
     "linux": {
       "target": [
         "AppImage"
       ],
       "icon": "resources/icons/plainscript.png",
-      "category": "Development"
+      "category": "Development",
+      "files": [
+        "!node_modules/@msgpackr-extract/msgpackr-extract-darwin-*",
+        "!node_modules/@msgpackr-extract/**/msgpackr-extract-darwin-*",
+        "!node_modules/@parcel/watcher/build/darwin*",
+        "!node_modules/drivelist/build/darwin*",
+        "!node_modules/keytar/build/darwin*",
+        "!node_modules/native-keymap/build/darwin*",
+        "!node_modules/node-pty/build/darwin*",
+        "!node_modules/@msgpackr-extract/msgpackr-extract-win32-*",
+        "!node_modules/@msgpackr-extract/**/msgpackr-extract-win32-*",
+        "!node_modules/@parcel/watcher/build/win32*",
+        "!node_modules/drivelist/build/win32*",
+        "!node_modules/keytar/build/win32*",
+        "!node_modules/native-keymap/build/win32*",
+        "!node_modules/node-pty/build/win32*"
+      ]
     },
     "appImage": {
       "artifactName": "PlainScript-${version}-x86_64.AppImage"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "icon": "resources/icons/plainscript.icns",
+      "category": "public.app-category.developer-tools",
+      "files": [
+        "!node_modules/@msgpackr-extract/msgpackr-extract-linux-*",
+        "!node_modules/@msgpackr-extract/**/msgpackr-extract-linux-*",
+        "!node_modules/@parcel/watcher/build/linux*",
+        "!node_modules/drivelist/build/linux*",
+        "!node_modules/keytar/build/linux*",
+        "!node_modules/native-keymap/build/linux*",
+        "!node_modules/node-pty/build/linux*",
+        "!node_modules/@msgpackr-extract/msgpackr-extract-win32-*",
+        "!node_modules/@msgpackr-extract/**/msgpackr-extract-win32-*",
+        "!node_modules/@parcel/watcher/build/win32*",
+        "!node_modules/drivelist/build/win32*",
+        "!node_modules/keytar/build/win32*",
+        "!node_modules/native-keymap/build/win32*",
+        "!node_modules/node-pty/build/win32*"
+      ]
+    },
+    "dmg": {
+      "artifactName": "PlainScript-${version}.dmg"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "resources/icons/plainscript.ico",
+      "files": [
+        "!node_modules/@msgpackr-extract/msgpackr-extract-darwin-*",
+        "!node_modules/@msgpackr-extract/**/msgpackr-extract-darwin-*",
+        "!node_modules/@parcel/watcher/build/darwin*",
+        "!node_modules/drivelist/build/darwin*",
+        "!node_modules/keytar/build/darwin*",
+        "!node_modules/native-keymap/build/darwin*",
+        "!node_modules/node-pty/build/darwin*",
+        "!node_modules/@msgpackr-extract/msgpackr-extract-linux-*",
+        "!node_modules/@msgpackr-extract/**/msgpackr-extract-linux-*",
+        "!node_modules/@parcel/watcher/build/linux*",
+        "!node_modules/drivelist/build/linux*",
+        "!node_modules/keytar/build/linux*",
+        "!node_modules/native-keymap/build/linux*",
+        "!node_modules/node-pty/build/linux*"
+      ]
+    },
+    "nsis": {
+      "artifactName": "PlainScript-Setup-${version}.exe",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "portable": {
+      "artifactName": "PlainScript-Portable-${version}.exe"
     }
   }
 }

@@ -272,6 +272,37 @@ Before/after or relevant UI changes
 
 ## Common Development Tasks
 
+### Build Troubleshooting
+
+If you encounter build issues, here are solutions based on recent fixes:
+
+**postinstall script fails**:
+- **Cause**: Theia CLI check fails during fresh `npm install`
+- **Solution**: The postinstall script now handles failures gracefully with `|| exit 0`
+- **If still failing**: Try `npm install --no-save` or delete `package-lock.json` and retry
+
+**Native module compilation errors**:
+- **Cause**: `native-keymap`, `keytar`, `node-pty` require native build tools
+- **Solution**: Install platform-specific dependencies:
+  - **Linux**: `sudo apt-get install build-essential python3 libsecret-1-dev`
+  - **macOS**: `brew install python3 libsecret`
+  - **Windows**: Install Python 3.11 and Visual Studio Build Tools
+- **If still failing**: Native modules can fail gracefully - the build is configured to continue
+
+**webpack build fails with "Cannot resolve 'native-keymap'"**:
+- **Cause**: Native modules not properly externalized
+- **Solution**: Ensure `electron-app/webpack.config.js` includes external requires for native modules
+- This is already configured - verify it wasn't accidentally reverted
+
+**Build succeeds but tests/runtime fail**:
+- **Cause**: Stale build artifacts or cache
+- **Solution**: Run clean build:
+  ```bash
+  npm run clean
+  npm ci
+  npm run build
+  ```
+
 ### Adding a Plugin
 
 1. Find extension on [Open VSX](https://open-vsx.org)

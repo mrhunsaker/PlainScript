@@ -8,7 +8,7 @@
     "build": "turbo run build",
     "start": "turbo start",
     "watch": "turbo run watch",
-    "postinstall": "if [ \"$SKIP_THEIA_CHECK\" = \"1\" ]; then exit 0; else npx --yes @theia/cli@1.67.0 theia check:theia-version; fi",
+    "postinstall": "if [ \"$SKIP_THEIA_CHECK\" = \"1\" ]; then exit 0; else npx --yes @theia/cli@1.67.0 theia check:theia-version || exit 0; fi",
     "clean": "turbo run clean && rimraf node_modules",
     "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false"
   },

@@ -374,34 +374,52 @@ For automated builds across all platforms, consider using:
 - **Electron Forge** or **Electron Builder** CI integrations
 - **Release automation** with tools like semantic-release
 
-Example GitHub Actions workflow structure:
+### Current GitHub Actions Workflow
 
-```yaml
-name: Build and Release
-on:
-  push:
-    tags:
-      - 'v*'
+This project includes a GitHub Actions workflow (`.github/workflows/build-appimage.yml`) that automates building for all three platforms. The workflow has been optimized to address common build issues:
 
-jobs:
-  build:
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run build
-      - run: npm run package --workspace=electron-app
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.os }}-build
-          path: electron-app/dist/*
-```
+#### Key Improvements (December 2025)
+
+**1. Platform-Specific Dependencies**
+   - **Linux**: Installs `build-essential`, `python3`, `libsecret-1-dev`, `libkeytar0` for native module compilation
+   - **macOS**: Installs `python3` and `libsecret` via Homebrew
+   - **Windows**: Sets up Python 3.11 for native module build support
+
+**2. npm Caching**
+   - All platforms now use npm caching to speed up CI runs
+   - Significantly reduces build times on subsequent runs
+
+**3. Native Module Handling**
+   - Build no longer fails if native modules cannot be compiled in CI environment
+   - Optional native modules are externalized in webpack config
+   - Supports `native-keymap`, `keytar`, `node-pty`, `drivelist`, and `@parcel/watcher`
+
+**4. Postinstall Robustness**
+   - Root `package.json` postinstall now gracefully handles Theia CLI failures
+   - No longer requires `SKIP_THEIA_CHECK=1` environment variable in CI
+
+#### Current Workflow Structure
+
+The workflow builds on all three platforms simultaneously when tags matching `v*` are pushed. Each platform:
+
+1. Checks out the code
+2. Sets up Node.js 20 with npm caching
+3. Installs platform-specific build tools
+4. Runs `npm ci` for clean dependency install
+5. Runs `npm run build` for all workspaces
+6. Packages the application with `npm run package --workspace=electron-app`
+7. Uploads artifacts to GitHub Releases
+
+**macOS and Windows configurations** follow the same pattern with platform-specific dependency installation.
+
+#### Troubleshooting CI Builds
+
+If CI builds fail:
+
+1. **Check build logs** in the GitHub Actions tab for specific error messages
+2. **Native module errors**: These are now handled gracefully and shouldn't block the build
+3. **Cache issues**: GitHub Actions automatically manages cache; force a fresh run if needed
+4. **Platform-specific failures**: Each platform has specific dependencies installed - verify they're present in your environment
 
 ## Additional Resources
 

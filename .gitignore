@@ -4,6 +4,3 @@ lib
 *.log
 *-app/*
 !*-app/package.json
-dist/
-plugins/
-*.AppImage

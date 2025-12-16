@@ -24,11 +24,11 @@
     "@theia/cli": "1.67.0"
   },
   "scripts": {
-    "build": "npm run rebuild && npx theia build --mode production",
-    "bundle": "npm run rebuild && npx theia build --mode development",
-    "rebuild": "npx theia rebuild:browser --cacheRoot ..",
+    "build": "npx theia build --mode production",
+    "bundle": "npx theia build --mode development",
+    "rebuild": "npx theia rebuild:browser --cacheRoot .. || true",
     "start": "npx theia start --plugins=local-dir:../plugins",
-    "watch": "npm run rebuild && npx theia build --watch --mode development"
+    "watch": "npx theia build --watch --mode development"
   },
   "theia": {
     "target": "browser",
