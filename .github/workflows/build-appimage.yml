@@ -14,11 +14,12 @@ env:
   ELECTRON_MIRROR: https://github.com/electron/electron/releases/
   ELECTRON_BUILD_DOWNLOAD_TIMEOUT: 120000
   ELECTRON_BUILD_DOWNLOAD_RETRY: 5
-  ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    env:
+      ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
     steps:
       - uses: actions/checkout@v4
 
@@ -85,6 +86,8 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
+    env:
+      ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
     steps:
       - uses: actions/checkout@v4
 
@@ -135,6 +138,8 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
+    env:
+      ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
     steps:
       - uses: actions/checkout@v4
 
