@@ -18,8 +18,6 @@ env:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    env:
-      ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
     steps:
       - uses: actions/checkout@v4
 
@@ -27,10 +25,14 @@ jobs:
         with:
           node-version: '20'
       - name: Prepare Electron cache (Linux)
+        env:
+          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
         run: |
           mkdir -p "$ELECTRON_CACHE"
           echo "Using Electron cache: $ELECTRON_CACHE"
       - name: Prefetch Electron to warm cache (Linux)
+        env:
+          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
         run: |
           npm config set fetch-retry-maxtimeout 120000
           npm config set fetch-retries 5
@@ -86,8 +88,6 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
-    env:
-      ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
     steps:
       - uses: actions/checkout@v4
 
@@ -95,6 +95,8 @@ jobs:
         with:
           node-version: '20'
       - name: Prepare Electron cache (macOS)
+        env:
+          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
         run: |
           mkdir -p "$ELECTRON_CACHE"
           echo "Using Electron cache: $ELECTRON_CACHE"
@@ -138,8 +140,6 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
-    env:
-      ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
     steps:
       - uses: actions/checkout@v4
 
