@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
+import { resolve, isAbsolute } from 'path';
 import { defineConfig } from 'vite';
 import { libInjectCss } from 'vite-plugin-lib-inject-css';
 
@@ -24,12 +24,16 @@ export default defineConfig({
         target: 'ES2022',
         rollupOptions: {
             external: (id) => {
-                // Aliases is not external
-                if (id.startsWith('@/')) {
+                // Do not externalize source aliases or absolute file paths (Windows and POSIX)
+                if (id.startsWith('@/') || isAbsolute(id)) {
                     return false;
                 }
-
-                return !id.startsWith('.') && !id.startsWith('/') && !id.includes('\\0');
+                // Keep Rollup virtual modules bundled
+                if (id.includes('\\0')) {
+                    return false;
+                }
+                // Externalize bare imports only
+                return !id.startsWith('.') && !id.startsWith('/');
             },
             output: {
                 preserveModules: true,
