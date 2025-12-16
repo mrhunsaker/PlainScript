@@ -30,9 +30,11 @@ jobs:
 
       - name: Clean install
         run: |
-          Remove-Item -Force -Recurse node_modules -ErrorAction SilentlyContinue
-          if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
-          npm install
+          rm -rf node_modules package-lock.json
+          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-retries 5
+          npm config set electron_mirror https://github.com/electron/electron/releases/
+          npm install --no-audit --prefer-offline
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -130,7 +132,12 @@ jobs:
       - name: Clean install and rebuild
         run: |
           rm -rf node_modules package-lock.json
-          npm install
+            Remove-Item -Force -Recurse node_modules -ErrorAction SilentlyContinue
+            if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
+            npm config set fetch-retry-maxtimeout 120000
+            npm config set fetch-retries 5
+            npm config set electron_mirror https://github.com/electron/electron/releases/
+            npm install --no-audit --prefer-offline
         shell: pwsh
 
       - name: Build custom-ui
