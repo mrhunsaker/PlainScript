@@ -11,7 +11,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ELECTRON_DOWNLOAD_MAX_ATTEMPTS: 5
-  ELECTRON_MIRROR: https://github.com/electron/electron/releases/download/v
   ELECTRON_BUILD_DOWNLOAD_TIMEOUT: 120000
   ELECTRON_BUILD_DOWNLOAD_RETRY: 5
 
