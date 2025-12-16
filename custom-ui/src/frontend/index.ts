@@ -29,9 +29,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // AI: Register AI Chat service and widget
     bind(AIService).toSelf().inSingletonScope();
     bind(AIChatWidget).toSelf();
-    bind(WidgetFactory).toDynamicValue((container) => ({
+    bind(WidgetFactory).toDynamicValue((context) => ({
         id: AIChatWidget.ID,
-        createWidget: () => container.get(AIChatWidget),
+        createWidget: () => context.container.get(AIChatWidget),
     })).inSingletonScope();
     initAIChatContribution({ bind });
 

@@ -1,8 +1,9 @@
-import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, nls, Command } from '@theia/core/lib/common';
+import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, Command } from '@theia/core/lib/common';
 import { inject, injectable, type interfaces } from '@theia/core/shared/inversify';
 import { CommonMenus } from '@theia/core/lib/browser';
 import { WidgetOpenHandler } from '@theia/core/lib/browser';
 import { AIChatWidget } from './ai-chat-widget';
+import URI from '@theia/core/lib/common/uri';
 
 export const OPEN_AI_CHAT_COMMAND = Command.toLocalizedCommand({
     id: 'ai:openChat',
@@ -17,8 +18,8 @@ export class AIChatWidgetOpenHandler extends WidgetOpenHandler<AIChatWidget> {
         return 1;
     }
 
-    async open(): Promise<AIChatWidget> {
-        return super.open();
+    protected createWidgetOptions(): object {
+        return {};
     }
 }
 
@@ -29,10 +30,7 @@ export class AIChatCommandContribution implements CommandContribution, MenuContr
 
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(OPEN_AI_CHAT_COMMAND, {
-            execute: async() => {
-                const widget = await this.openHandler.open();
-                return widget;
-            },
+            execute: () => this.openHandler.open(new URI('ai-chat://default')),
         });
     }
 

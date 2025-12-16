@@ -2,7 +2,7 @@ import './style/ai-chat.less';
 
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { injectable, inject } from '@theia/core/shared/inversify';
-import { Message } from '@phosphor/messaging';
+import { Message } from '@lumino/messaging';
 import * as React from 'react';
 import { AIService } from './ai-service';
 
