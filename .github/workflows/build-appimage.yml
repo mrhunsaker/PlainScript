@@ -6,6 +6,11 @@ on:
       - 'v*'
   workflow_dispatch:
 
+env:
+  SKIP_THEIA_CHECK: 1
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -19,12 +24,10 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full libx11-dev libxkbfile-dev
+          sudo apt-get install -y p7zip-full build-essential python3 libsecret-1-dev
 
       - name: Clean install
-        run: SKIP_THEIA_CHECK=1 npm ci
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm ci
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -70,9 +73,7 @@ jobs:
           node-version: '20'
 
       - name: Clean install
-        run: SKIP_THEIA_CHECK=1 npm ci
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm ci
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -90,40 +91,38 @@ jobs:
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
-        with:
-          name: plainscript-macos
-          path: electron-app/dist/*.{dmg,zip}
-          retention-days: 30
+        build-windows:
+          runs-on: windows-latest
+          steps:
+            - uses: actions/checkout@v4
 
-      - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: electron-app/dist/*.{dmg,zip}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - uses: actions/setup-python@v4
+              with:
+                python-version: '3.11'
 
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                node-version: '20'
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+            - name: Clean install
+              run: npm ci --no-optional
+              shell: pwsh
 
-      - name: Clean install
-        run: $env:SKIP_THEIA_CHECK='1'; npm ci --no-optional
-        shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Clean npm cache and reinstall (Windows)
+              run: |
+                Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue
+                npm cache clean --force
+                npm install
+              shell: pwsh
 
-      - name: Clean npm cache and reinstall (Windows)
-        run: |
-          Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue
-          npm cache clean --force
+            - name: Build custom-ui
+              run: npm run build --workspace=custom-ui
+
+            - name: Build browser-app
+              run: npm run build --workspace=browser-app
+
+            - name: Build electron-app
+              run: npm run build --workspace=electron-app
           npm install
         shell: pwsh
 
