@@ -5,19 +5,17 @@ lib
 *-app/*
 !*-app/package.json
 dist/
-# Keep a lightweight plugins/ folder in the repo but ignore large/binary plugin files
-# Allow the folder itself and small metadata files, but ignore heavy assets
-plugins/
-!plugins/
-plugins/*.vsix
-plugins/**/*.vsix
-plugins/**/node_modules/
-plugins/**/*.tgz
+# Keep plugins out of VCS by default; whitelist a few small ones
+plugins/**
 !plugins/.gitkeep
 !plugins/README.md
-!plugins/Catppuccin.catppuccin-vsc-icons/
-!plugins/oderwat.indent-rainbow/
+!plugins/Catppuccin.catppuccin-vsc-icons/**
+!plugins/oderwat.indent-rainbow/**
 
-# Ensure scripts folder is not ignored so helper scripts can be committed
+# Ignore packaged artifacts and generated plugin copies
+electron-app/dist/
+electron-app/plugins/**
+
+# Ensure scripts folder is kept so helper scripts can be committed
 !electron-app/scripts/
 *.AppImage

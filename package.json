@@ -26,7 +26,8 @@
     "@vscode/ripgrep": "^1.17.0"
   },
   "overrides": {
-    "@vscode/ripgrep": "^1.17.0"
+    "@vscode/ripgrep": "^1.17.0",
+    "@theia/monaco-editor-core": "1.96.302"
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {

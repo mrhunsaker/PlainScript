@@ -4,7 +4,7 @@ set -euo pipefail
 # Clean, rebuild, and package the PlainScript AppImage from scratch.
 # Run this inside your toolbox (or a Linux shell with 7zip installed).
 
-ROOT_DIR="/var/home/ryhunsaker/customIDE"
+ROOT_DIR="/var/home/ryhunsaker/PlainScript"
 cd "$ROOT_DIR"
 
 # 1) Remove build outputs and caches
@@ -30,12 +30,17 @@ rm -rf \
 # 2) Fresh install (skip Theia version check during CI/install)
 SKIP_THEIA_CHECK=1 npm ci
 
+# 2.5) Ensure plugins are freshly downloaded (Catppuccin icons, indent-rainbow, etc.)
+npm run download:plugins
+
 # 3) Build each workspace (order matters: ui -> browser -> electron)
 npm run build --workspace=custom-ui
 npm run build --workspace=browser-app
 npm run build --workspace=electron-app
 
 # 4) Package the Electron app (AppImage lands in electron-app/dist)
+# Electron Builder will use the icons from electron-app/resources/icons
+# via the "build.linux.icon" and platform-specific icon fields in electron-app/package.json
 npm run package --workspace=electron-app
 
 echo "Done. AppImage should be in electron-app/dist/PlainScript-*-x86_64.AppImage"
