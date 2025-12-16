@@ -7,22 +7,14 @@ on:
   workflow_dispatch:
 
 env:
-      - name: Prefetch Electron to warm cache (macOS)
-  ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
-        run: |
-          npm config set fetch-retry-maxtimeout 120000
-          npm config set fetch-retries 5
-          npm config set electron_mirror https://github.com/electron/electron/releases/
-          npm install electron@38.4.0 --no-audit --prefer-offline || true
   SKIP_THEIA_CHECK: 1
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ELECTRON_DOWNLOAD_MAX_ATTEMPTS: 5
-          npm config set fetch-retries 5
-          npm config set electron_mirror https://github.com/electron/electron/releases/
   ELECTRON_MIRROR: https://github.com/electron/electron/releases/
   ELECTRON_BUILD_DOWNLOAD_TIMEOUT: 120000
   ELECTRON_BUILD_DOWNLOAD_RETRY: 5
+  ELECTRON_CACHE: ${{ runner.temp }}/electron-cache
 
 jobs:
   build-linux:
@@ -33,7 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Prepare Electron cache (macOS)
+      - name: Prepare Electron cache (Linux)
         run: |
           mkdir -p "$ELECTRON_CACHE"
           echo "Using Electron cache: $ELECTRON_CACHE"
@@ -99,7 +91,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Prepare Electron cache (Linux)
+      - name: Prepare Electron cache (macOS)
         run: |
           mkdir -p "$ELECTRON_CACHE"
           echo "Using Electron cache: $ELECTRON_CACHE"
@@ -155,15 +147,14 @@ jobs:
           node-version: '20'
 
       - name: Clean install and rebuild
-        run: |
-          rm -rf node_modules package-lock.json
-            Remove-Item -Force -Recurse node_modules -ErrorAction SilentlyContinue
-            if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
-            npm config set fetch-retry-maxtimeout 120000
-            npm config set fetch-retries 5
-            npm config set electron_mirror https://github.com/electron/electron/releases/
-            npm install --no-audit --prefer-offline
         shell: pwsh
+        run: |
+          Remove-Item -Force -Recurse node_modules -ErrorAction SilentlyContinue
+          if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
+          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-retries 5
+          npm config set electron_mirror https://github.com/electron/electron/releases/
+          npm install --no-audit --prefer-offline
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
