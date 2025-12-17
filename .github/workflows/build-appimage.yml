@@ -20,6 +20,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clear caches (Linux)
+        run: |
+          rm -rf ~/.cache/electron ~/.cache/electron-builder || true
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -94,6 +98,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clear caches (macOS)
+        run: |
+          rm -rf "$HOME/Library/Caches/electron" "$HOME/Library/Caches/electron-builder" || true
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -163,6 +171,8 @@ jobs:
       - name: Clean install and rebuild
         shell: pwsh
         run: |
+          Remove-Item -Force -Recurse "$env:LOCALAPPDATA\electron\Cache" -ErrorAction SilentlyContinue
+          Remove-Item -Force -Recurse "$env:LOCALAPPDATA\electron-builder\Cache" -ErrorAction SilentlyContinue
           Remove-Item -Force -Recurse node_modules -ErrorAction SilentlyContinue
           if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
           npm config set fetch-retry-maxtimeout 120000
