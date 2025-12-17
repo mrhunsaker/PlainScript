@@ -49,6 +49,9 @@ jobs:
           npm config set fetch-retries 5
           npm install --no-audit --prefer-offline
 
+      - name: Download Theia plugins
+        run: npm run download:plugins
+
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
 
@@ -59,6 +62,9 @@ jobs:
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
           npm run build --workspace=electron-app
+
+      - name: Prepare plugins for electron-app
+        run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package AppImage
         run: npm run package --workspace=electron-app
@@ -104,6 +110,9 @@ jobs:
           npm config set fetch-retry-maxtimeout 120000
           npm install
 
+      - name: Download Theia plugins
+        run: npm run download:plugins
+
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
 
@@ -114,6 +123,9 @@ jobs:
         run: |
           export NODE_OPTIONS=--max_old_space_size=4096
           npm run build --workspace=electron-app
+
+      - name: Prepare plugins for electron-app
+        run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package macOS (DMG + ZIP)
         run: npm run package --workspace=electron-app
@@ -157,6 +169,9 @@ jobs:
           npm config set fetch-retries 5
           npm install --no-audit --prefer-offline
 
+      - name: Download Theia plugins
+        run: npm run download:plugins
+
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
 
@@ -165,6 +180,9 @@ jobs:
 
       - name: Build electron-app
         run: npm run build --workspace=electron-app
+
+      - name: Prepare plugins for electron-app
+        run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package Windows (NSIS + Portable)
         run: npm run package --workspace=electron-app
