@@ -10,7 +10,11 @@
     "watch": "turbo run watch",
     "postinstall": "node ./scripts/postinstall.js",
     "clean": "turbo run clean && rimraf node_modules",
-    "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false"
+    "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false",
+    "clean:all": "bash ./scripts/clean-all.sh",
+    "rebuild:all": "bash ./scripts/rebuild-all.sh",
+    "clean:all:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\clean-all.ps1",
+    "rebuild:all:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\rebuild-all.ps1"
   },
     "repository": {
       "type": "git",
