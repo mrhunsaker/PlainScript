@@ -195,7 +195,7 @@ npm run build
 
 ## Quick Tips
 
-✨ **Did you know?**
+**Did you know?**
 
 - Both browser and Electron versions use identical settings and plugins
 - The output panel is locked by default (prevents accidental closure)
@@ -205,6 +205,6 @@ npm run build
 
 ---
 
-Enjoy using Custom IDE! 🚀
+Enjoy using Custom IDE! 
 
 Questions? See [README.md](./README.md) or check [GitHub Issues](https://github.com/your-username/customIDE/issues)

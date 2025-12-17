@@ -64,7 +64,7 @@ check_import() {
     fi
 }
 
-echo "📁 Checking Component Files..."
+echo " Checking Component Files..."
 echo ""
 
 check_file "custom-ui/src/frontend/ai-chat-widget.ts" "AI Chat Widget component"
@@ -73,7 +73,7 @@ check_file "custom-ui/src/frontend/ai-chat-contribution.ts" "Theia integration"
 check_file "custom-ui/src/frontend/style/ai-chat.less" "AI Chat styles"
 
 echo ""
-echo "📚 Checking Documentation Files..."
+echo " Checking Documentation Files..."
 echo ""
 
 check_file "AI_CHAT_QUICKSTART.md" "Quick start guide"
@@ -109,7 +109,7 @@ else
 fi
 
 echo ""
-echo "🎨 Checking Style Import..."
+echo " Checking Style Import..."
 echo ""
 
 if grep -q "import './style/ai-chat.less'" "custom-ui/src/frontend/ai-chat-widget.ts"; then
@@ -121,7 +121,7 @@ fi
 
 echo ""
 echo "=================================================="
-echo "📊 Verification Results"
+echo " Verification Results"
 echo "=================================================="
 echo ""
 
@@ -137,23 +137,23 @@ else
 fi
 
 echo ""
-echo "📋 Next Steps:"
+echo " Next Steps:"
 echo ""
 
 if [ $errors -eq 0 ]; then
-    echo "1. ✅ All components are installed correctly"
-    echo "2. 📖 Follow the setup in AI_CHAT_QUICKSTART.md"
-    echo "3. 🔑 Set your AI provider API key"
-    echo "4. 🏗️  Run: npm run build"
-    echo "5. ▶️  Open PlainScript and go to View → AI Chat"
+    echo "1. All components are installed correctly"
+    echo "2. Follow the setup in AI_CHAT_QUICKSTART.md"
+    echo "3. Set your AI provider API key"
+    echo "4. Run: npm run build"
+    echo "5. Open PlainScript and go to View → AI Chat"
 else
-    echo "1. ❌ Fix the errors listed above"
-    echo "2. 📖 Check AI_CHAT_README.md for troubleshooting"
-    echo "3. 🔄 Re-run this script to verify"
+    echo "1. Fix the errors listed above"
+    echo "2. Check AI_CHAT_README.md for troubleshooting"
+    echo "3. Re-run this script to verify"
 fi
 
 echo ""
-echo "📚 Documentation:"
+echo " Documentation:"
 echo "  - Quick Start: cat AI_CHAT_QUICKSTART.md"
 echo "  - Full Docs: cat AI_CHAT_README.md"
 echo "  - Examples: cat AI_CHAT_EXAMPLES.ts"

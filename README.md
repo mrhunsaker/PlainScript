@@ -645,40 +645,40 @@ Built with:
 ### Version 1.0.0-beta (Initial Public Release - December 14, 2025)
 
 **Core Features**:
-- ✅ Dual platform support (browser + Electron)
-- ✅ Launch scripts (Bash + PowerShell)
-- ✅ Perfect browser/Electron parity
-- ✅ Custom accessible UI layout
+-  Dual platform support (browser + Electron)
+-  Launch scripts (Bash + PowerShell)
+-  Perfect browser/Electron parity
+-  Custom accessible UI layout
 
 **Accessibility**:
-- ✅ Screenreader-friendly structure
-- ✅ Full keyboard navigation
-- ✅ WCAG AA compliant color themes
-- ✅ Semantic HTML with ARIA labels
+-  Screenreader-friendly structure
+-  Full keyboard navigation
+-  WCAG AA compliant color themes
+-  Semantic HTML with ARIA labels
 
 **Plugins & Theming**:
-- ✅ 5 carefully selected plugins (language support, themes, icons)
-- ✅ Alabaster light/dark themes (high contrast)
-- ✅ Catppuccin semantic icons
-- ✅ Indent Rainbow visualization
+-  5 carefully selected plugins (language support, themes, icons)
+-  Alabaster light/dark themes (high contrast)
+-  Catppuccin semantic icons
+-  Indent Rainbow visualization
 
 **UI Customization**:
-- ✅ Transparent inclusion/exclusion documentation
-- ✅ Streamlined layout (Files + Editor + Output only)
-- ✅ Top-oriented tabs
-- ✅ Locked output panel
+-  Transparent inclusion/exclusion documentation
+-  Streamlined layout (Files + Editor + Output only)
+-  Top-oriented tabs
+-  Locked output panel
 
 **Distribution**:
-- ✅ Clean build script (`scripts/build-appimage-clean.sh`)
-- ✅ GitHub Actions CI/CD workflow (Linux, macOS, Windows)
-- ✅ Automated AppImage, DMG, NSIS packaging
-- ✅ Comprehensive PACKAGING.md guide
+-  Clean build script (`scripts/build-appimage-clean.sh`)
+-  GitHub Actions CI/CD workflow (Linux, macOS, Windows)
+-  Automated AppImage, DMG, NSIS packaging
+-  Comprehensive PACKAGING.md guide
 
 **Developer Experience**:
-- ✅ Monorepo structure (browser-app, electron-app, custom-ui)
-- ✅ Apache 2.0 license
-- ✅ Clear contribution guidelines
-- ✅ Documentation for forking and customization
+-  Monorepo structure (browser-app, electron-app, custom-ui)
+-  Apache 2.0 license
+-  Clear contribution guidelines
+-  Documentation for forking and customization
 
 ---
 

@@ -256,12 +256,12 @@ aiService.setConfig({
 
 ## Key Benefits
 
-✅ Non-intrusive - AI chat in secondary window  
-✅ Easy to configure - 5 minutes to first AI response  
-✅ Flexible - Works with any AI provider  
-✅ Themeable - Matches your application colors  
-✅ Extensible - Easy to add custom features  
-✅ Local option - Works offline with Ollama  
+ Non-intrusive - AI chat in secondary window  
+ Easy to configure - 5 minutes to first AI response  
+ Flexible - Works with any AI provider  
+ Themeable - Matches your application colors  
+ Extensible - Easy to add custom features  
+ Local option - Works offline with Ollama  
 
 ---
 

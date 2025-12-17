@@ -25,14 +25,14 @@ This document explains the AI chat functionality added to PlainScript and how to
 
 ## Features
 
-- ✅ Secondary window for AI chat (separate from main interface)
-- ✅ Message history with timestamps
-- ✅ User and assistant message distinction
-- ✅ Context-aware responses
-- ✅ Loading indicator during API calls
-- ✅ Keyboard shortcuts (Ctrl+Enter to send)
-- ✅ Themeable UI matching your application colors
-- ✅ Responsive design
+-  Secondary window for AI chat (separate from main interface)
+-  Message history with timestamps
+-  User and assistant message distinction
+-  Context-aware responses
+-  Loading indicator during API calls
+-  Keyboard shortcuts (Ctrl+Enter to send)
+-  Themeable UI matching your application colors
+-  Responsive design
 
 ## Opening AI Chat
 
