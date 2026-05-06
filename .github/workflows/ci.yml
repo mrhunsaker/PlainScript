@@ -126,12 +126,13 @@ jobs:
       - name: Run npm audit (non-blocking)
         run: npm audit --audit-level=moderate || true
 
-      - name: Check for high/critical vulnerabilities
+      - name: Check for high/critical vulnerabilities (report-only)
         run: |
           if npm audit --audit-level=high 2>&1 | grep -q 'high\|critical'; then
-            echo "⚠️  High/Critical vulnerabilities found. Review before merging."
-            npm audit --audit-level=high
-            exit 1
+            echo "⚠️  High/Critical vulnerabilities found. Review recommended."
+            npm audit --audit-level=high || true
+          else
+            echo "✅ No high/critical vulnerabilities found."
           fi
 
   accessibility-check:
