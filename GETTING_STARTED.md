@@ -7,11 +7,13 @@ Welcome! This guide will have you up and running in minutes.
 ### 1. Prerequisites
 
 Ensure you have installed:
+
 - **Node.js**: [Download v20+](https://nodejs.org/)
 - **npm**: Comes with Node.js
 - **Git**: [Download](https://git-scm.com/) (for cloning the repo)
 
 Verify installation:
+
 ```bash
 node --version    # Should be 20.0 or higher
 npm --version     # Should be 10.0 or higher
@@ -49,6 +51,7 @@ This fetches the minimal theme and extension set (Alabaster themes, icons, Inden
 ### Option 1: Quick Launch Scripts (Recommended)
 
 **Linux/macOS**:
+
 ```bash
 ./customide-browser    # Launch browser version
 ```
@@ -58,6 +61,7 @@ This fetches the minimal theme and extension set (Alabaster themes, icons, Inden
 ```
 
 **Windows (PowerShell)**:
+
 ```powershell
 .\customide-browser.ps1
 ```
@@ -69,16 +73,19 @@ This fetches the minimal theme and extension set (Alabaster themes, icons, Inden
 ### Option 2: Direct npm Commands
 
 **Browser version** (opens at http://localhost:3000):
+
 ```bash
 npm run start --workspace=browser-app
 ```
 
 **Electron version** (launches desktop app):
+
 ```bash
 npm run start --workspace=electron-app
 ```
 
 **Both simultaneously**:
+
 ```bash
 npm run start
 ```
@@ -86,6 +93,7 @@ npm run start
 ### Option 3: Full Build + Launch
 
 If you want a clean build:
+
 ```bash
 npm run build         # Production build
 npm run start         # Launch both versions
@@ -94,12 +102,14 @@ npm run start         # Launch both versions
 ## What You Get
 
 ### Browser Version
+
 - Web-based IDE
 - Access at `http://localhost:3000`
 - No installation needed on other computers (just send them the URL)
 - Lightweight and fast
 
 ### Electron Version
+
 - Native desktop application
 - Works offline
 - Better system integration
@@ -127,24 +137,25 @@ npm run start         # Launch both versions
 
 ## Keyboard Shortcuts
 
-| Action | Shortcut |
-|--------|----------|
+| Action          | Shortcut           |
+| --------------- | ------------------ |
 | Command Palette | F1 or Ctrl+Shift+P |
-| Open File | Ctrl+P |
-| Open Folder | Ctrl+K Ctrl+O |
-| Toggle Terminal | Ctrl+` |
-| New File | Ctrl+N |
-| Save | Ctrl+S |
-| Search | Ctrl+F |
-| Replace | Ctrl+H |
-| Full Screen | F11 |
-| Split Editor | Ctrl+\ |
+| Open File       | Ctrl+P             |
+| Open Folder     | Ctrl+K Ctrl+O      |
+| Toggle Terminal | Ctrl+`             |
+| New File        | Ctrl+N             |
+| Save            | Ctrl+S             |
+| Search          | Ctrl+F             |
+| Replace         | Ctrl+H             |
+| Full Screen     | F11                |
+| Split Editor    | Ctrl+\             |
 
 ## Troubleshooting
 
 ### It won't start
 
 **Port 3000 in use**:
+
 ```bash
 # Kill the process
 lsof -i :3000
@@ -155,6 +166,7 @@ npm run start --workspace=browser-app
 ```
 
 **Dependencies missing**:
+
 ```bash
 npm install
 npm run download:plugins
@@ -205,6 +217,7 @@ npm run build
 
 ---
 
-Enjoy using Custom IDE! 
+Enjoy using Custom IDE!
 
-Questions? See [README.md](./README.md) or check [GitHub Issues](https://github.com/your-username/customIDE/issues)
+Questions? See [README.md](./README.md) or check
+[GitHub Issues](https://github.com/your-username/customIDE/issues)

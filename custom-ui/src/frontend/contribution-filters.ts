@@ -10,17 +10,14 @@
  * Verification method: Search https://github.com/eclipse-theia/theia/tree/v1.67.0
  *   for each class name and confirm the exported class has the exact matching name.
  */
-import {
-  ContributionFilterRegistry,
-  FilterContribution,
-} from "@theia/core/lib/common";
-import { injectable, interfaces } from "@theia/core/shared/inversify";
+import { ContributionFilterRegistry, FilterContribution } from '@theia/core/lib/common';
+import { injectable, interfaces } from '@theia/core/shared/inversify';
 
 // Run Test Contribution
-import { TestOutputViewContribution } from "@theia/test/lib/browser/view/test-output-view-contribution";
-import { TestResultViewContribution } from "@theia/test/lib/browser/view/test-result-view-contribution";
-import { TestRunViewContribution } from "@theia/test/lib/browser/view/test-run-view-contribution";
-import { TestViewContribution } from "@theia/test/lib/browser/view/test-view-contribution";
+import { TestOutputViewContribution } from '@theia/test/lib/browser/view/test-output-view-contribution';
+import { TestResultViewContribution } from '@theia/test/lib/browser/view/test-result-view-contribution';
+import { TestRunViewContribution } from '@theia/test/lib/browser/view/test-run-view-contribution';
+import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 
 const filteredInstances = [
   TestViewContribution,
@@ -31,26 +28,24 @@ const filteredInstances = [
 
 // Fallback by constructor name so we do not need every module imported.
 const filteredNames = [
-  "DebugFrontendApplicationContribution",
-  "DebugFrontendContribution",
-  "ScmContribution",
-  "OutlineViewContribution",
-  "CallHierarchyContribution",
-  "ProblemContribution",
-  "PluginApiFrontendContribution",
-  "PluginFrontendViewContribution",
-  "WindowContribution",
+  'DebugFrontendApplicationContribution',
+  'DebugFrontendContribution',
+  'ScmContribution',
+  'OutlineViewContribution',
+  'CallHierarchyContribution',
+  'ProblemContribution',
+  'PluginApiFrontendContribution',
+  'PluginFrontendViewContribution',
+  'WindowContribution',
 ];
 
 @injectable()
 export class RemoveFromUIFilterContribution implements FilterContribution {
   registerContributionFilters(registry: ContributionFilterRegistry): void {
-    registry.addFilters("*", [
+    registry.addFilters('*', [
       (contrib) => {
-        const ctorName = contrib?.constructor?.name ?? "";
-        const blockedByInstance = filteredInstances.some(
-          (c) => contrib instanceof c,
-        );
+        const ctorName = contrib?.constructor?.name ?? '';
+        const blockedByInstance = filteredInstances.some((c) => contrib instanceof c);
         const blockedByName = filteredNames.includes(ctorName);
         return !(blockedByInstance || blockedByName);
       },
@@ -64,7 +59,5 @@ export function registerFilters({
   bind: interfaces.Bind;
   rebind: interfaces.Rebind;
 }): void {
-  bind(FilterContribution)
-    .to(RemoveFromUIFilterContribution)
-    .inSingletonScope();
+  bind(FilterContribution).to(RemoveFromUIFilterContribution).inSingletonScope();
 }

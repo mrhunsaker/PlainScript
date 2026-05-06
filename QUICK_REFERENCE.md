@@ -3,14 +3,17 @@
 ## Launch Commands
 
 ### Browser (Web)
+
 ```bash
 ./customide-browser    # Linux/macOS
 .\customide-browser.ps1 # Windows (PowerShell)
 npm run start --workspace=browser-app
 ```
+
 Access at: **http://localhost:3000**
 
 ### Electron (Desktop)
+
 ```bash
 ./customide-electron    # Linux/macOS
 .\customide-electron.ps1 # Windows (PowerShell)
@@ -18,6 +21,7 @@ npm run start --workspace=electron-app
 ```
 
 ### Both Simultaneously
+
 ```bash
 npm run start
 ```
@@ -42,41 +46,42 @@ npm run download:plugins # Fetch VSCode extensions
 
 ## File Locations
 
-| Item | Location |
-|------|----------|
-| UI Customizations | `custom-ui/src/frontend/` |
-| Plugins Config | `package.json` (`theiaPlugins`) |
-| Theme Settings | `browser-app/package.json` & `electron-app/package.json` |
-| Installed Plugins | `plugins/` |
-| Documentation | `README.md`, `GETTING_STARTED.md`, `CONTRIBUTING.md` |
+| Item              | Location                                                 |
+| ----------------- | -------------------------------------------------------- |
+| UI Customizations | `custom-ui/src/frontend/`                                |
+| Plugins Config    | `package.json` (`theiaPlugins`)                          |
+| Theme Settings    | `browser-app/package.json` & `electron-app/package.json` |
+| Installed Plugins | `plugins/`                                               |
+| Documentation     | `README.md`, `GETTING_STARTED.md`, `CONTRIBUTING.md`     |
 
 ## Default Settings
 
-| Setting | Value |
-|---------|-------|
-| Color Theme | Alabaster |
-| Icon Theme | Catppuccin VSC Icons - Latte |
-| Workspace Trust | Disabled |
-| Extensions Verification | Disabled |
-| Plugins Directory | `local-dir:../plugins` |
+| Setting                 | Value                        |
+| ----------------------- | ---------------------------- |
+| Color Theme             | Alabaster                    |
+| Icon Theme              | Catppuccin VSC Icons - Latte |
+| Workspace Trust         | Disabled                     |
+| Extensions Verification | Disabled                     |
+| Plugins Directory       | `local-dir:../plugins`       |
 
 ## Keyboard Shortcuts
 
-| Action | Shortcut |
-|--------|----------|
+| Action          | Shortcut               |
+| --------------- | ---------------------- |
 | Command Palette | `F1` or `Ctrl+Shift+P` |
-| Quick Open File | `Ctrl+P` |
-| Find | `Ctrl+F` |
-| Replace | `Ctrl+H` |
-| Terminal | `Ctrl+` ` |
-| Split Editor | `Ctrl+\` |
-| Save | `Ctrl+S` |
-| Undo | `Ctrl+Z` |
-| Redo | `Ctrl+Y` |
+| Quick Open File | `Ctrl+P`               |
+| Find            | `Ctrl+F`               |
+| Replace         | `Ctrl+H`               |
+| Terminal        | `Ctrl+` `              |
+| Split Editor    | `Ctrl+\`               |
+| Save            | `Ctrl+S`               |
+| Undo            | `Ctrl+Z`               |
+| Redo            | `Ctrl+Y`               |
 
 ## Common Tasks
 
 ### Add a Plugin
+
 1. Find on [Open VSX](https://open-vsx.org)
 2. Copy VSIX URL
 3. Add to `package.json` > `theiaPlugins`
@@ -84,18 +89,23 @@ npm run download:plugins # Fetch VSCode extensions
 5. Restart app
 
 ### Remove a Plugin
+
 1. Delete from `package.json` > `theiaPlugins`
 2. Delete folder from `plugins/`
 3. Restart app
 
 ### Change Default Theme
+
 Edit `browser-app/package.json` and `electron-app/package.json`:
+
 ```json
 "workbench.colorTheme": "Alabaster Dark"
 ```
+
 Then restart.
 
 ### Modify UI Layout
+
 1. Edit files in `custom-ui/src/frontend/`
 2. Run `npm run build --workspace=custom-ui`
 3. Run `npm run bundle --workspace=browser-app`
@@ -104,12 +114,12 @@ Then restart.
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| Port 3000 in use | `lsof -i :3000` → `kill -9 <PID>` |
-| Plugins won't load | `npm run download:plugins` then restart |
-| Theme not applying | F1 → "Color Theme" → select theme → restart |
-| Build fails | `npm run clean` → `npm install` → `npm run build` |
+| Problem            | Solution                                          |
+| ------------------ | ------------------------------------------------- |
+| Port 3000 in use   | `lsof -i :3000` → `kill -9 <PID>`                 |
+| Plugins won't load | `npm run download:plugins` then restart           |
+| Theme not applying | F1 → "Color Theme" → select theme → restart       |
+| Build fails        | `npm run clean` → `npm install` → `npm run build` |
 
 ## Documentation
 

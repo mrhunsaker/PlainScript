@@ -7,7 +7,8 @@ This document outlines coding style, formatting conventions, and best practices 
 - **Language**: TypeScript (strict mode)
 - **Formatter**: Prettier (2-space indent, 100-char line length)
 - **Linter**: ESLint (based on TypeScript recommended rules + custom accessibility rules)
-- **File naming**: kebab-case for files/folders, PascalCase for classes, camelCase for functions/variables
+- **File naming**: kebab-case for files/folders, PascalCase for classes, camelCase for
+  functions/variables
 - **Browser support**: Latest Chromium/Firefox (via Theia/Electron)
 
 ## Running Style Tools
@@ -40,8 +41,8 @@ npm run format --workspace=custom-ui
    }
 
    // ❌ Bad
-   const value = maybeString();  // Type is 'any'
-   console.log(value.length);     // Unsafe
+   const value = maybeString(); // Type is 'any'
+   console.log(value.length); // Unsafe
    ```
 
 2. **Explicit types**: Don't rely on type inference for complex types
@@ -56,7 +57,7 @@ npm run format --workspace=custom-ui
    const config: UserConfig = { name: 'test', theme: 'light' };
 
    // ❌ Bad
-   const config = { name: 'test', theme: 'light' };  // Type not clear
+   const config = { name: 'test', theme: 'light' }; // Type not clear
    ```
 
 3. **Avoid `any`**: Use `unknown` or generics instead
@@ -75,15 +76,15 @@ npm run format --workspace=custom-ui
 
 ### Naming Conventions
 
-| Target | Convention | Example |
-|--------|-----------|---------|
-| Classes | PascalCase | `KeyboardShortcutsContribution` |
-| Functions | camelCase | `initApplicationShell()` |
-| Constants | UPPER_SNAKE_CASE | `MAX_RETRY_COUNT = 3` |
-| Variables | camelCase | `isInitialized` |
-| Interfaces | PascalCase, prefix `I` optional | `ContributionFilters` |
-| Types | PascalCase | `ShellOptions` |
-| Enums | PascalCase | `PanelState` |
+| Target     | Convention                      | Example                         |
+| ---------- | ------------------------------- | ------------------------------- |
+| Classes    | PascalCase                      | `KeyboardShortcutsContribution` |
+| Functions  | camelCase                       | `initApplicationShell()`        |
+| Constants  | UPPER_SNAKE_CASE                | `MAX_RETRY_COUNT = 3`           |
+| Variables  | camelCase                       | `isInitialized`                 |
+| Interfaces | PascalCase, prefix `I` optional | `ContributionFilters`           |
+| Types      | PascalCase                      | `ShellOptions`                  |
+| Enums      | PascalCase                      | `PanelState`                    |
 
 ### File Organization
 
@@ -123,7 +124,7 @@ export type { MyOptions };
 // ✅ Good
 /**
  * Initializes the keyboard shortcuts panel.
- * 
+ *
  * @param bind - Inversify container binding method
  * @throws Error if dependencies not injected
  */
@@ -137,7 +138,7 @@ export function initKeyboardShortcuts({ bind }: { bind: interfaces.Bind }): void
  * Init kb shortcuts
  */
 export function initKeyboardShortcuts({ bind }) {
-  bind(KeyboardShortcutsContribution).toSelf().inSingletonScope();  // What does this do?
+  bind(KeyboardShortcutsContribution).toSelf().inSingletonScope(); // What does this do?
 }
 ```
 
@@ -165,10 +166,12 @@ export function initKeyboardShortcuts({ bind }) {
 
 // ❌ Bad
 .theia-header {
-  background-color: #1e1e1e;           // Hardcoded color
+  background-color: #1e1e1e; // Hardcoded color
   .item {
     .inner {
-      .deep { ... }                    // Too deep nesting
+      .deep {
+        ...;
+      } // Too deep nesting
     }
   }
 }
@@ -276,7 +279,7 @@ class FileItem extends React.Component {
 export class MyService {
   constructor(
     @inject(Logger) protected readonly logger: Logger,
-    @inject(FileService) protected readonly files: FileService,
+    @inject(FileService) protected readonly files: FileService
   ) {}
 
   doSomething(): void {
@@ -285,7 +288,7 @@ export class MyService {
 }
 
 // ❌ Bad
-const logger = new Logger();  // Hard-coded dependency
+const logger = new Logger(); // Hard-coded dependency
 export class MyService {
   doSomething(): void {
     logger.info('Doing something');
@@ -305,13 +308,13 @@ async function saveFile(path: string, content: string): Promise<void> {
       logger.warn(`Permission denied: ${path}`);
       throw new UserFacingError(`Cannot write to ${path}`);
     }
-    throw error;  // Re-throw unexpected errors
+    throw error; // Re-throw unexpected errors
   }
 }
 
 // ❌ Bad
 async function saveFile(path: string, content: string): Promise<void> {
-  await fs.writeFile(path, content);  // No error handling
+  await fs.writeFile(path, content); // No error handling
 }
 ```
 
@@ -352,7 +355,8 @@ const config: ContributionFilters = initFilters({
 });
 
 // ❌ Bad (over 120 chars)
-const veryLongMessageThatExceedsTheLineLimit = 'This line is way too long and should be split into multiple lines for readability';
+const veryLongMessageThatExceedsTheLineLimit =
+  'This line is way too long and should be split into multiple lines for readability';
 ```
 
 ### Indentation
@@ -371,7 +375,7 @@ if (condition) {
 
 // ❌ Bad
 if (condition) {
-    doSomething();  // 4 spaces
+  doSomething(); // 4 spaces
   if (nested) {
     doMore();
   }
@@ -397,7 +401,7 @@ export { MyClass };
 // ❌ Bad
 import * as inversify from '@theia/core/shared/inversify';
 import { Command, unused, alsoUnused } from '@theia/core/lib/common';
-import MyUtility from './my-utility';  // Default export
+import MyUtility from './my-utility'; // Default export
 
 export default MyClass;
 ```
@@ -425,7 +429,7 @@ export function initKeyboardShortcuts({ bind }: Params): void {
 
 // ❌ Bad
 // TODO: fix this
-const x = y;  // Assigns y to x
+const x = y; // Assigns y to x
 ```
 
 ## Pre-commit Checklist

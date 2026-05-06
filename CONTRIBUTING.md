@@ -1,10 +1,12 @@
 # Contributing to PlainScript
 
-Thank you for your interest in contributing to PlainScript! We welcome contributions from everyone, whether it's code, documentation, bug reports, or feature suggestions.
+Thank you for your interest in contributing to PlainScript! We welcome contributions from everyone,
+whether it's code, documentation, bug reports, or feature suggestions.
 
 ## Code of Conduct
 
-Please read and follow our [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md). We are committed to providing a welcoming and inclusive environment.
+Please read and follow our [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md). We are committed to providing
+a welcoming and inclusive environment.
 
 ## Getting Started
 
@@ -404,8 +406,7 @@ When reporting bugs, include:
 **Error**:
 ```
 
-Error: Cannot read property 'close' of undefined
-at FileWidget.closeFile (application-shell.ts:123)
+Error: Cannot read property 'close' of undefined at FileWidget.closeFile (application-shell.ts:123)
 
 ```
 

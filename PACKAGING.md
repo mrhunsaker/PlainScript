@@ -5,6 +5,7 @@ This guide covers building distributable packages for PlainScript IDE on macOS, 
 ## Prerequisites
 
 ### All Platforms
+
 - Node.js >= 20
 - npm >= 10
 - Clean workspace: `npm ci` to install dependencies
@@ -13,15 +14,18 @@ This guide covers building distributable packages for PlainScript IDE on macOS, 
 ### Platform-Specific Requirements
 
 #### macOS
+
 - macOS 10.13+ (for building)
 - Xcode Command Line Tools: `xcode-select --install`
 - Optional: Apple Developer ID for code signing
 
 #### Windows
+
 - Windows 10+ or Windows Server 2016+
 - Optional: Code signing certificate
 
 #### Linux (AppImage)
+
 - Any modern Linux distribution
 - For Fedora Silverblue/Kinoite (immutable OS):
   ```bash
@@ -36,7 +40,8 @@ This guide covers building distributable packages for PlainScript IDE on macOS, 
 
 ## Configuration
 
-The Electron app packaging configuration is located in `electron-app/package.json` under the `build` section:
+The Electron app packaging configuration is located in `electron-app/package.json` under the `build`
+section:
 
 ```json
 {
@@ -104,10 +109,12 @@ The Electron app packaging configuration is located in `electron-app/package.jso
 Ensure you have the appropriate icon formats for each platform:
 
 - **macOS**: `electron-app/resources/icons/plainscript.icns` (ICNS format, 512x512 recommended)
-- **Windows**: `electron-app/resources/icons/plainscript.ico` (ICO format, multiple sizes: 16, 32, 48, 256)
+- **Windows**: `electron-app/resources/icons/plainscript.ico` (ICO format, multiple sizes: 16, 32,
+  48, 256)
 - **Linux**: `electron-app/resources/icons/plainscript.png` (PNG format, 512x512 recommended)
 
 You can generate icons from a single PNG using tools like:
+
 - [electron-icon-builder](https://www.npmjs.com/package/electron-icon-builder)
 - [electron-builder icon conversion](https://www.electron.build/icons)
 
@@ -118,12 +125,14 @@ You can generate icons from a single PNG using tools like:
 **Prerequisites**: Must be run on macOS.
 
 1. Ensure dependencies are installed and built:
+
    ```bash
    npm ci
    npm run build
    ```
 
 2. Package the application:
+
    ```bash
    npm run package --workspace=electron-app
    ```
@@ -137,6 +146,7 @@ You can generate icons from a single PNG using tools like:
 To sign the macOS build:
 
 1. Set environment variables:
+
    ```bash
    export CSC_LINK=/path/to/certificate.p12
    export CSC_KEY_PASSWORD=your-certificate-password
@@ -156,12 +166,14 @@ To sign the macOS build:
 **Prerequisites**: Can be built on Windows, macOS, or Linux (cross-platform build).
 
 1. Ensure dependencies are installed and built:
+
    ```bash
    npm ci
    npm run build
    ```
 
 2. Package the application:
+
    ```bash
    npm run package --workspace=electron-app
    ```
@@ -188,6 +200,7 @@ npm run package --workspace=electron-app
 To sign the Windows build:
 
 1. Set environment variables:
+
    ```bash
    export CSC_LINK=/path/to/certificate.pfx
    export CSC_KEY_PASSWORD=your-certificate-password
@@ -207,6 +220,7 @@ To sign the Windows build:
 #### Standard Linux (Ubuntu, Debian, Fedora Workstation, etc.)
 
 1. Install 7zip:
+
    ```bash
    # Debian/Ubuntu
    sudo apt-get install -y p7zip-full
@@ -219,12 +233,14 @@ To sign the Windows build:
    ```
 
 2. Ensure dependencies are installed and built:
+
    ```bash
    npm ci
    npm run build
    ```
 
 3. Package the application:
+
    ```bash
    npm run package --workspace=electron-app
    ```
@@ -237,22 +253,26 @@ To sign the Windows build:
 Due to the immutable nature of these systems, use a toolbox container:
 
 1. Create and enter a toolbox:
+
    ```bash
    toolbox create plainscript-build
    toolbox enter plainscript-build
    ```
 
 2. Install build tools inside the toolbox:
+
    ```bash
    sudo dnf install -y p7zip p7zip-plugins
    ```
 
 3. Navigate to your project (accessible from toolbox):
+
    ```bash
    cd /var/home/$USER/customIDE
    ```
 
 4. Build the application:
+
    ```bash
    npm ci
    npm run build
@@ -311,7 +331,8 @@ Note: Cross-platform builds require the appropriate tools (e.g., wine for Window
 
 #### "theia: command not found" during packaging
 
-**Solution**: The build config includes `npmRebuild: false` to prevent this. If you still encounter it, ensure your root `package.json` postinstall script uses `npx`:
+**Solution**: The build config includes `npmRebuild: false` to prevent this. If you still encounter
+it, ensure your root `package.json` postinstall script uses `npx`:
 
 ```json
 "postinstall": "npx --yes @theia/cli check:theia-version"
@@ -324,6 +345,7 @@ Note: Cross-platform builds require the appropriate tools (e.g., wine for Window
 #### Missing 7zip on Linux
 
 **Solution**: Install platform-specific 7zip package:
+
 - Debian/Ubuntu: `sudo apt-get install -y p7zip-full`
 - Fedora: `sudo dnf install -y p7zip p7zip-plugins`
 - Arch: `sudo pacman -S p7zip`
@@ -334,7 +356,8 @@ Note: Cross-platform builds require the appropriate tools (e.g., wine for Window
 
 #### Code signing errors
 
-**Solution**: Ensure your certificates are valid and environment variables are set correctly. For testing, you can skip code signing by not setting `CSC_*` variables.
+**Solution**: Ensure your certificates are valid and environment variables are set correctly. For
+testing, you can skip code signing by not setting `CSC_*` variables.
 
 ## Clean Build
 

@@ -2,7 +2,8 @@
 
 ## Reporting a Vulnerability
 
-Please do **NOT** open a public issue for security vulnerabilities. Instead, report security issues privately.
+Please do **NOT** open a public issue for security vulnerabilities. Instead, report security issues
+privately.
 
 ### How to Report
 
@@ -66,7 +67,7 @@ const userContent = getUserInput();
 element.innerHTML = userContent; // XSS vulnerability
 
 // Don't hardcode secrets
-const apiKey = "sk-1234567890abcdef";
+const apiKey = 'sk-1234567890abcdef';
 ```
 
 **✅ Good**:
@@ -78,7 +79,7 @@ element.textContent = userContent; // Safe
 
 // Use environment variables
 const apiKey = process.env.API_KEY;
-if (!apiKey) throw new Error("API_KEY not set");
+if (!apiKey) throw new Error('API_KEY not set');
 ```
 
 ## Known Security Considerations
@@ -88,7 +89,8 @@ if (!apiKey) throw new Error("API_KEY not set");
 PlainScript inherits security model from Theia:
 
 - **Workspace isolation**: File access restricted to workspace root
-- **Extension sandboxing**: Plugins run in browser context (browser app) or Node.js with access restrictions (Electron)
+- **Extension sandboxing**: Plugins run in browser context (browser app) or Node.js with access
+  restrictions (Electron)
 - **Authentication**: Integrated through Theia's GitHub auth
 - **No telemetry**: No data collection by default
 
@@ -166,7 +168,8 @@ We monitor and report vulnerabilities in:
 
 ## Contribution Guidelines
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed contribution guidelines. Security considerations:
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed contribution guidelines. Security
+considerations:
 
 - Don't introduce dependencies without security review
 - Follow [STYLE_GUIDE.md](./STYLE_GUIDE.md) secure coding practices
