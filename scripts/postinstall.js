@@ -1,19 +1,30 @@
-const { execSync } = require('child_process');
+const { execSync } = require("child_process");
+const { join } = require("path");
 
-if (process.env.SKIP_THEIA_CHECK === '1') {
+if (process.env.SKIP_THEIA_CHECK === "1") {
   process.exit(0);
 }
 
 try {
-  // Prefer npx with explicit -y to avoid npm exec resolution issues on newer npm/Volta.
-  execSync('npx -y @theia/cli@1.67.0 theia check:theia-version', { stdio: 'inherit' });
+  // Prefer the local workspace binary when dependencies are present.
+  const localTheiaBin = join(process.cwd(), "node_modules", ".bin", "theia");
+  execSync(`\"${localTheiaBin}\" check:theia-version`, { stdio: "inherit" });
 } catch (err) {
-  console.warn('postinstall: theia check failed (non-fatal):', err && err.message ? err.message : err);
-  // Fallback attempt without version pin, in case the versioned npx fails.
+  console.warn(
+    "postinstall: local theia check failed (non-fatal):",
+    err && err.message ? err.message : err,
+  );
+  // npm 10+ compatible fallback: install package temporarily and run its binary.
   try {
-    execSync('npx theia check:theia-version', { stdio: 'inherit' });
+    execSync(
+      "npm exec --yes --package @theia/cli@1.67.0 -- theia check:theia-version",
+      { stdio: "inherit" },
+    );
   } catch (err2) {
-    console.warn('postinstall: theia check fallback failed (non-fatal):', err2 && err2.message ? err2.message : err2);
+    console.warn(
+      "postinstall: theia check fallback failed (non-fatal):",
+      err2 && err2.message ? err2.message : err2,
+    );
   }
   // Don't fail the install if the Theia check cannot run.
   process.exit(0);

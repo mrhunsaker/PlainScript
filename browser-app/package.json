@@ -38,7 +38,7 @@
         "reloadOnReconnect": true,
         "preferences": {
           "workbench.iconTheme": "Catppuccin VSC Icons - Latte",
-          "workbench.colorTheme": "Alabaster",
+          "workbench.colorTheme": "Catppuccin Latte",
           "security.workspace.trust.enabled": false,
           "security.workspace.trust.startupPrompt": "never",
           "security.workspace.trust.emptyWindowTrust": "trusted",

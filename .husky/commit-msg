@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "📋 Validating commit message format..."
+
+# Get the commit message
+commit_msg=$(cat "$1")
+
+# Check if it follows conventional commit format
+# Format: type(scope): subject
+if ! echo "$commit_msg" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|ci|revert)(\(.+\))?!?: .{1,}'; then
+  echo "❌ Commit message does not follow conventional commit format:"
+  echo ""
+  echo "Expected format: type(scope): subject"
+  echo "Example: feat(custom-ui): add keyboard shortcuts reference"
+  echo ""
+  echo "Valid types:"
+  echo "  feat      - A new feature"
+  echo "  fix       - A bug fix"
+  echo "  docs      - Documentation only"
+  echo "  style     - Code style changes (formatting, semicolons)"
+  echo "  refactor  - Code refactoring"
+  echo "  perf      - Performance improvements"
+  echo "  test      - Test additions/changes"
+  echo "  chore     - Build, dependencies, tooling"
+  echo "  ci        - CI/CD configuration"
+  echo "  revert    - Revert previous commit"
+  echo ""
+  echo "Your message:"
+  echo "  $commit_msg"
+  exit 1
+fi
+
+echo "✅ Commit message valid!"

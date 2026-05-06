@@ -27,6 +27,25 @@ npm run build --workspace=electron-app
 echo "📁 Preparing plugins for electron runtime..."
 npm run prepare:plugins --workspace=electron-app
 
+# Validate required icon files before packaging
+for ICON_FILE in \
+		"electron-app/resources/icons/plainscript.png" \
+		"electron-app/resources/icons/plainscript.ico"; do
+	if [ ! -f "$ROOT_DIR/$ICON_FILE" ]; then
+		echo "ERROR: Required icon file missing: $ICON_FILE"
+		echo "Run: cd electron-app/resources/icons && magick plainscript.png -define icon:auto-resize=256,48,32,16 plainscript.ico"
+		exit 1
+	fi
+done
+echo "Icon files verified."
+
+# Validate plugins were downloaded
+if [ -z "$(ls -A "$ROOT_DIR/plugins/" 2>/dev/null | grep -v '^\.' | grep -v 'README' | grep -v '.gitkeep')" ]; then
+	echo "ERROR: plugins/ directory appears empty. Run: npm run download:plugins"
+	exit 1
+fi
+echo "Plugins directory verified."
+
 echo "🗜️  Packaging electron-app..."
 npm run package --workspace=electron-app
 

@@ -1,6 +1,10 @@
-# Contributing to Custom IDE
+# Contributing to PlainScript
 
-Thank you for your interest in contributing! This guide will help you get started.
+Thank you for your interest in contributing to PlainScript! We welcome contributions from everyone, whether it's code, documentation, bug reports, or feature suggestions.
+
+## Code of Conduct
+
+Please read and follow our [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md). We are committed to providing a welcoming and inclusive environment.
 
 ## Getting Started
 
@@ -9,35 +13,70 @@ Thank you for your interest in contributing! This guide will help you get starte
 - Node.js >= 20.0
 - npm >= 10.0
 - Git
-- Basic understanding of TypeScript and React (for UI modifications)
+- Familiarity with [TypeScript](https://www.typescriptlang.org/) and [React](https://react.dev/)
+- Basic understanding of [Theia IDE](https://theia-ide.org/)
 
 ### Setup Development Environment
 
-```bash
-# Clone the repository
-git clone https://github.com/your-username/customIDE.git
-cd customIDE
+1. **Fork the repository** on GitHub
+2. **Clone your fork**:
 
-# Install dependencies
-npm install
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/PlainScript.git
+   cd PlainScript
+   ```
 
-# Download plugins
-npm run download:plugins
+3. **Add upstream remote**:
 
-# Verify both versions build
-npm run build
-```
+   ```bash
+   git remote add upstream https://github.com/mrhunsaker/PlainScript.git
+   ```
+
+4. **Install dependencies**:
+
+   ```bash
+   npm install
+   npm run download:plugins
+   ```
+
+5. **Verify setup**:
+
+   ```bash
+   npm run build --workspace=custom-ui
+   ```
 
 ## Development Workflow
+
+### Creating a Feature Branch
+
+```bash
+# Update main from upstream
+git fetch upstream
+git checkout main
+git reset --hard upstream/main
+
+# Create a feature branch
+git checkout -b feature/your-feature-name
+```
+
+Branch naming conventions:
+
+- `feature/short-description` — New features
+- `fix/short-description` — Bug fixes
+- `docs/short-description` — Documentation
+- `refactor/short-description` — Code refactoring
+- `test/short-description` — Test additions
 
 ### Running the IDE
 
 Start both versions simultaneously:
+
 ```bash
 npm run start
 ```
 
 Or individually:
+
 ```bash
 npm run start --workspace=browser-app    # http://localhost:3000
 npm run start --workspace=electron-app   # Desktop app
@@ -46,11 +85,13 @@ npm run start --workspace=electron-app   # Desktop app
 ### Watch Mode
 
 For development with hot reload:
+
 ```bash
 npm run watch
 ```
 
 For specific workspace:
+
 ```bash
 npm run watch --workspace=custom-ui
 ```
@@ -114,6 +155,7 @@ git checkout -b fix/my-bugfix
 Edit relevant files for your contribution type:
 
 **Modifying UI layout**:
+
 ```
 custom-ui/
 ├── src/frontend/
@@ -124,11 +166,13 @@ custom-ui/
 ```
 
 **Modifying plugins**:
+
 ```
 Root package.json → theiaPlugins section
 ```
 
 **Modifying preferences**:
+
 ```
 browser-app/package.json → theia.frontend.config.preferences
 electron-app/package.json → theia.frontend.config.preferences
@@ -137,6 +181,7 @@ electron-app/package.json → theia.frontend.config.preferences
 ### 3. Test Your Changes
 
 **For custom-ui changes**:
+
 ```bash
 npm run build --workspace=custom-ui
 npm run bundle --workspace=browser-app
@@ -144,6 +189,7 @@ npm run bundle --workspace=electron-app
 ```
 
 **Test in both platforms**:
+
 ```bash
 npm run start
 ```
@@ -151,6 +197,7 @@ npm run start
 Access browser at `http://localhost:3000` and verify Electron app launches.
 
 **Run tests** (if applicable):
+
 ```bash
 npm test
 ```
@@ -158,6 +205,7 @@ npm test
 ### 4. Keep Dependencies Updated
 
 Before submitting, ensure no security vulnerabilities:
+
 ```bash
 npm audit
 npm audit fix
@@ -176,6 +224,7 @@ git commit -am 'Add feature: descriptive title
 ```
 
 **Commit message format**:
+
 - First line: Short summary (50 chars max)
 - Blank line
 - Detailed explanation if needed
@@ -188,6 +237,7 @@ git push origin feature/my-feature
 ```
 
 Then create a PR on GitHub with:
+
 - Clear title describing the change
 - Description of what and why
 - Screenshots if UI-related
@@ -234,6 +284,7 @@ Then create a PR on GitHub with:
 ## Pull Request Guidelines
 
 **Before submitting PR**:
+
 - [ ] Changes tested in both browser and Electron
 - [ ] No breaking changes (or clearly documented)
 - [ ] Code follows project style
@@ -242,11 +293,14 @@ Then create a PR on GitHub with:
 - [ ] Documentation updated
 
 **PR Template**:
+
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] UI improvement
@@ -254,15 +308,19 @@ Brief description of changes
 - [ ] Other
 
 ## Testing
+
 Steps to verify the change:
-1. 
-2. 
-3. 
+
+1.
+2.
+3.
 
 ## Screenshots (if applicable)
+
 Before/after or relevant UI changes
 
 ## Checklist
+
 - [ ] Tested in browser version
 - [ ] Tested in Electron version
 - [ ] Updated documentation
@@ -277,9 +335,11 @@ Before/after or relevant UI changes
 1. Find extension on [Open VSX](https://open-vsx.org)
 2. Get VSIX URL
 3. Add to `package.json`:
+
    ```json
    "publisher.extension-name": "https://open-vsx.org/api/.../file/...vsix"
    ```
+
 4. Run `npm run download:plugins`
 5. Test: `npm run start`
 
@@ -293,6 +353,7 @@ Before/after or relevant UI changes
 ### Changing Default Theme
 
 Edit both:
+
 - `browser-app/package.json` → `theia.frontend.config.preferences`
 - `electron-app/package.json` → `theia.frontend.config.preferences`
 
@@ -311,18 +372,21 @@ Then restart app.
 When reporting bugs, include:
 
 **Required**:
+
 - OS and Node.js version
 - Steps to reproduce
 - Expected vs actual behavior
 - Error message or screenshot
 
 **Optional**:
+
 - Browser/Electron console output
 - Custom configuration if relevant
 - Related plugins or extensions
 - Attempted solutions
 
 **Good bug report example**:
+
 ```
 **Environment**:
 - OS: Ubuntu 22.04
@@ -339,8 +403,10 @@ When reporting bugs, include:
 
 **Error**:
 ```
+
 Error: Cannot read property 'close' of undefined
 at FileWidget.closeFile (application-shell.ts:123)
+
 ```
 
 **Workaround**: Restart the app
@@ -367,4 +433,4 @@ By contributing, you agree that your contributions will be licensed under the Ap
 
 ---
 
-Thank you for contributing to Custom IDE! 
+Thank you for contributing to Custom IDE!

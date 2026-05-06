@@ -27,6 +27,25 @@ npm run build --workspace=electron-app
 Write-Host "📁 Preparing plugins for electron runtime..."
 npm run prepare:plugins --workspace=electron-app
 
+$iconRoot = Join-Path $PSScriptRoot '..\electron-app\resources\icons'
+$requiredIcons = @('plainscript.png', 'plainscript.ico')
+foreach ($icon in $requiredIcons) {
+	$iconPath = Join-Path $iconRoot $icon
+	if (-not (Test-Path -Path $iconPath -PathType Leaf)) {
+		Write-Error "ERROR: Required icon file missing: electron-app/resources/icons/$icon"
+		Write-Host 'Run: cd electron-app/resources/icons && magick plainscript.png -define icon:auto-resize=256,48,32,16 plainscript.ico'
+		exit 1
+	}
+}
+Write-Host 'Icon files verified.'
+
+$pluginItems = Get-ChildItem -Path (Join-Path $PSScriptRoot '..\plugins') -Exclude '.gitkeep','README.md' -ErrorAction SilentlyContinue
+if (-not $pluginItems) {
+	Write-Error 'ERROR: plugins/ directory appears empty. Run: npm run download:plugins'
+	exit 1
+}
+Write-Host 'Plugins directory verified.'
+
 Write-Host "🗜️  Packaging electron-app..."
 npm run package --workspace=electron-app
 

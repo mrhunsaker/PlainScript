@@ -8,6 +8,11 @@
     "build": "turbo run build",
     "start": "turbo start",
     "watch": "turbo run watch",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write '**/*.{ts,tsx,js,jsx,json,md,less}'",
+    "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md,less}'",
+    "prepare": "husky install",
     "postinstall": "node ./scripts/postinstall.js",
     "clean": "turbo run clean && rimraf node_modules",
     "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false",
@@ -16,10 +21,10 @@
     "clean:all:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\clean-all.ps1",
     "rebuild:all:win": "powershell -ExecutionPolicy Bypass -File .\\scripts\\rebuild-all.ps1"
   },
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/mrhunsaker/PlainScript.git"
-    },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrhunsaker/PlainScript.git"
+  },
   "workspaces": [
     "browser-app",
     "custom-ui",
@@ -37,19 +42,24 @@
   "theiaPlugins": {
     "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.95.3/file/eclipse-theia.builtin-extension-pack-1.95.3.vsix",
     "Catppuccin.catppuccin-vsc-icons": "https://open-vsx.org/api/Catppuccin/catppuccin-vsc-icons/1.26.0/file/Catppuccin.catppuccin-vsc-icons-1.26.0.vsix",
-    "tonsky.theme-alabaster": "https://open-vsx.org/api/tonsky/theme-alabaster/0.2.9/file/tonsky.theme-alabaster-0.2.9.vsix",
-    "lao-liang.vscode-theme-alabaster-dark": "https://open-vsx.org/api/lao-liang/vscode-theme-alabaster-dark/0.0.2/file/lao-liang.vscode-theme-alabaster-dark-0.0.2.vsix",
+    "Catppuccin.catppuccin-vsc": "https://open-vsx.org/api/Catppuccin/catppuccin-vsc/3.19.0/file/Catppuccin.catppuccin-vsc-3.19.0.vsix",
     "oderwat.indent-rainbow": "https://open-vsx.org/api/oderwat/indent-rainbow/8.3.1/file/oderwat.indent-rainbow-8.3.1.vsix"
   },
   "devDependencies": {
-    "@flexbe/eslint-config": "^1.0.11",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "copy-webpack-plugin": "8.1.1",
+    "eslint": "^9.11.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
     "rimraf": "6.0.1",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "copy-webpack-plugin": "13.0.0",
     "yargs": "17",
-    "@types/yargs": "17"
-    ,"cross-env": "^7.0.3",
+    "@types/yargs": "17",
+    "cross-env": "^7.0.3",
     "shx": "^0.3.4"
   }
 }

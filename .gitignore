@@ -19,3 +19,4 @@ electron-app/plugins/**
 # Ensure scripts folder is kept so helper scripts can be committed
 !electron-app/scripts/
 *.AppImage
+remediation.json

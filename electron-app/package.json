@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@theia/cli": "1.67.0",
-    "electron": "39.8.5",
+    "electron": "38.4.0",
     "electron-builder": "^24.13.3"
   },
   "scripts": {
@@ -37,7 +37,7 @@
     "bundle": "npm run rebuild && npx theia build --mode development",
     "prepare:plugins": "node ./scripts/prepare-plugins.mjs",
     "package": "npm run build && npm run prepare:plugins && npx electron-builder",
-    "rebuild": "npx theia rebuild:electron --cacheRoot ..",
+    "rebuild": "chmod +x ../node_modules/.bin/electron-rebuild 2>/dev/null || true; npx theia rebuild:electron --cacheRoot ..",
     "start": "npx theia start --plugins=local-dir:plugins",
     "watch": "npm run rebuild && npx theia build --watch --mode development"
   },
@@ -49,7 +49,7 @@
         "reloadOnReconnect": true,
         "preferences": {
           "workbench.iconTheme": "Catppuccin VSC Icons - Latte",
-          "workbench.colorTheme": "Alabaster",
+          "workbench.colorTheme": "Catppuccin Latte",
           "security.workspace.trust.enabled": false,
           "security.workspace.trust.startupPrompt": "never",
           "security.workspace.trust.emptyWindowTrust": "trusted",
