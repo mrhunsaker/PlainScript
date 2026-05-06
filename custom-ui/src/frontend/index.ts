@@ -1,11 +1,11 @@
-import { ContainerModule } from "@theia/core/shared/inversify";
+import { ContainerModule } from '@theia/core/shared/inversify';
 
-import { initCommands } from "./commands-contributions";
-import { registerFilters } from "./contribution-filters";
-import * as AppShell from "./application-shell";
-import * as Navigator from "./navigator-widget-factory";
-import { initKeyboardShortcutsContribution } from "./keyboard-shortcuts-contribution";
-import { initOutputContribution } from "./output-toolbar-contribution";
+import { initCommands } from './commands-contributions';
+import { registerFilters } from './contribution-filters';
+import * as appShell from './application-shell';
+import * as navigator from './navigator-widget-factory';
+import { initKeyboardShortcutsContribution } from './keyboard-shortcuts-contribution';
+import { initOutputContribution } from './output-toolbar-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
   // Filter out modules we don't want to see in the editor
@@ -18,12 +18,12 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
   // (No custom search widget configuration present)
 
   // EXPLORER: Rebind Navigation factory to remove open editors widget
-  Navigator.initFileNavigator({ bind, rebind });
+  navigator.initFileNavigator({ bind, rebind });
 
   // OUTPUT: Rebind Output widget to disable closing
   initOutputContribution({ bind, rebind });
   initKeyboardShortcutsContribution({ bind });
 
   // Shell: Disable collapsing panels and dnd
-  AppShell.initApplicationShell({ bind, rebind });
+  appShell.initApplicationShell({ bind, rebind });
 });

@@ -35,7 +35,7 @@
         "destructuredArrayIgnorePattern": "^_"
       }
     ],
-    "@typescript-eslint/explicit-function-return-types": [
+    "@typescript-eslint/explicit-function-return-type": [
       "error",
       {
         "allowExpressions": true,

@@ -1,0 +1,101 @@
+site_name: PlainScript IDE
+site_url: https://mrhunsaker.github.io/plainscript/
+site_description: >-
+  Minimal, accessible Theia-based IDE — API and developer documentation.
+site_author: mrhunsaker
+repo_name: mrhunsaker/PlainScript
+repo_url: https://github.com/mrhunsaker/PlainScript
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - navigation.expand
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search:
+      lang: en
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Overview: getting-started.md
+      - Installation: installation.md
+      - Architecture: architecture.md
+  - API Reference:
+      - Overview: api/index.md
+      - Module Entry Point: api/module-index.md
+      - Application Shell: api/application-shell.md
+      - Commands & Menus: api/commands-contributions.md
+      - Contribution Filters: api/contribution-filters.md
+      - Keyboard Shortcuts: api/keyboard-shortcuts-contribution.md
+      - Navigator Widget: api/navigator-widget-factory.md
+      - Output Toolbar: api/output-toolbar-contribution.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/mrhunsaker/PlainScript
+  generator: false
+
+copyright: >-
+  Copyright &copy; 2024–2026 mrhunsaker — <a href="#__consent">Change cookie settings</a>

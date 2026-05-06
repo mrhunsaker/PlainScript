@@ -28,7 +28,7 @@ governance through multiple layers of automation.
 
 ```bash
 npm install          # Husky hooks auto-installed via "prepare" script
-# First commit may require: npx husky install
+# First commit may require: npx husky
 ```
 
 #### Expected workflow:

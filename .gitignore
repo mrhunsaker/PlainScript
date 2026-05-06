@@ -20,3 +20,6 @@ electron-app/plugins/**
 !electron-app/scripts/
 *.AppImage
 remediation.json
+
+# MkDocs build output
+site/

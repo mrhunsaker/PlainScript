@@ -1,5 +1,5 @@
-import "./style/application-shell.less";
-import "./style/side-panel.less";
+import './style/application-shell.less';
+import './style/side-panel.less';
 
 import {
   ApplicationShell as TheiaApplicationShell,
@@ -9,19 +9,14 @@ import {
   Panel,
   SidePanelHandler as TheiaSidePanelHandler,
   type SideTabBar,
-} from "@theia/core/lib/browser";
-import { FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
-import { TheiaSplitPanel } from "@theia/core/lib/browser/shell/theia-split-panel";
-import { DefaultFrontendApplicationContribution } from "@theia/core/lib/browser/frontend-application-contribution";
-import {
-  inject,
-  injectable,
-  postConstruct,
-  type interfaces,
-} from "@theia/core/shared/inversify";
-import { FileNavigatorContribution } from "@theia/navigator/lib/browser/navigator-contribution";
-import { OutputContribution } from "@theia/output/lib/browser/output-contribution";
-import { SearchInWorkspaceFrontendContribution } from "@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution";
+} from '@theia/core/lib/browser';
+import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { TheiaSplitPanel } from '@theia/core/lib/browser/shell/theia-split-panel';
+import { DefaultFrontendApplicationContribution } from '@theia/core/lib/browser/frontend-application-contribution';
+import { inject, injectable, postConstruct, type interfaces } from '@theia/core/shared/inversify';
+import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
+import { OutputContribution } from '@theia/output/lib/browser/output-contribution';
+import { SearchInWorkspaceFrontendContribution } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 
 export function initApplicationShell({
   bind,
@@ -59,29 +54,29 @@ export class ShellInitContribution extends DefaultFrontendApplicationContributio
     await this.openDefaultLayout();
   }
 
-  async onStart(): Promise<void> {
+  onStart(): void {
     this.appStateService.onStateChanged((state) => {
-      if (state === "ready") {
-        document.body.classList.add("theia-app-ready");
+      if (state === 'ready') {
+        document.body.classList.add('theia-app-ready');
       }
     });
   }
 
   protected async openDefaultLayout(): Promise<void> {
     await this.navigatorContribution.openView({
-      area: "left",
+      area: 'left',
       reveal: true,
       rank: 100,
     });
 
     await this.searchContribution.openView({
-      area: "left",
+      area: 'left',
       reveal: false,
       rank: 200,
     });
 
     void this.outputContribution.openView({
-      area: "bottom",
+      area: 'bottom',
       reveal: true,
     });
   }
@@ -96,24 +91,24 @@ export class SidePanelHandler extends TheiaSidePanelHandler {
     const sideBar = super.createSideBar();
 
     sideBar.tabsMovable = false;
-    sideBar.removeClass("theia-app-left");
-    sideBar.removeClass("theia-app-right");
-    sideBar.addClass("theia-app-top");
+    sideBar.removeClass('theia-app-left');
+    sideBar.removeClass('theia-app-right');
+    sideBar.addClass('theia-app-top');
 
     return sideBar;
   }
 
   protected override createContainer(): Panel {
-    this.tabBar.orientation = "horizontal";
+    this.tabBar.orientation = 'horizontal';
 
     const sidePanelLayout = new BoxLayout({
-      direction: "top-to-bottom",
+      direction: 'top-to-bottom',
       spacing: 0,
     });
     const container = new BoxPanel({ layout: sidePanelLayout });
     const headerPanel = new Panel();
-    headerPanel.node.setAttribute("role", "navigation");
-    headerPanel.node.setAttribute("aria-label", "Editor panel navigation");
+    headerPanel.node.setAttribute('role', 'navigation');
+    headerPanel.node.setAttribute('aria-label', 'Editor panel navigation');
 
     BoxPanel.setStretch(headerPanel, 0);
     sidePanelLayout.addWidget(headerPanel);
@@ -130,15 +125,15 @@ export class SidePanelHandler extends TheiaSidePanelHandler {
     BoxPanel.setStretch(this.topMenu, 0);
     headerPanel.addWidget(this.topMenu);
 
-    headerPanel.addClass("theia-header-panel");
+    headerPanel.addClass('theia-header-panel');
     container.id = `theia-${this.side}-content-panel`;
 
     return container;
   }
 
   // Disable collapse to keep tabs visible
-  override async collapse(): Promise<void> {
-    return;
+  override collapse(): Promise<void> {
+    return Promise.resolve();
   }
 }
 
@@ -168,19 +163,21 @@ export class ApplicationShell extends TheiaApplicationShell {
     super.init();
   }
 
-  getInsertionOptions(options?: TheiaApplicationShell.WidgetOptions) {
-    if (options?.area === "right") {
-      options.area = "left";
+  getInsertionOptions(
+    options?: TheiaApplicationShell.WidgetOptions
+  ): ReturnType<TheiaApplicationShell['getInsertionOptions']> {
+    if (options?.area === 'right') {
+      options.area = 'left';
     }
     return super.getInsertionOptions(options);
   }
 
   override handleEvent(event: Event): void {
     switch (event.type) {
-      case "lm-dragenter":
-      case "lm-dragleave":
-      case "lm-dragover":
-      case "lm-drop":
+      case 'lm-dragenter':
+      case 'lm-dragleave':
+      case 'lm-dragover':
+      case 'lm-drop':
         return;
     }
     return super.handleEvent(event);
@@ -189,35 +186,29 @@ export class ApplicationShell extends TheiaApplicationShell {
   /**
    * Create a custom layout with spacing between panels.
    */
-  protected createLayout() {
+  protected createLayout(): ReturnType<TheiaApplicationShell['createLayout']> {
     const SPACING = 6;
 
-    const bottomSplitLayout = this.createSplitLayout(
-      [this.mainPanel, this.bottomPanel],
-      [1, 0],
-      { orientation: "vertical", spacing: SPACING },
-    );
+    const bottomSplitLayout = this.createSplitLayout([this.mainPanel, this.bottomPanel], [1, 0], {
+      orientation: 'vertical',
+      spacing: SPACING,
+    });
     const panelForBottomArea = new TheiaSplitPanel({
       layout: bottomSplitLayout,
     });
-    panelForBottomArea.id = "theia-bottom-split-panel";
+    panelForBottomArea.id = 'theia-bottom-split-panel';
 
     const leftRightSplitLayout = this.createSplitLayout(
-      [
-        this.leftPanelHandler.container,
-        panelForBottomArea,
-        this.rightPanelHandler.container,
-      ],
+      [this.leftPanelHandler.container, panelForBottomArea, this.rightPanelHandler.container],
       [0, 1, 0],
-      { orientation: "horizontal", spacing: SPACING },
+      { orientation: 'horizontal', spacing: SPACING }
     );
     const mainIDEPanel = new TheiaSplitPanel({ layout: leftRightSplitLayout });
-    mainIDEPanel.id = "theia-main-ide-panel";
+    mainIDEPanel.id = 'theia-main-ide-panel';
 
-    return this.createBoxLayout(
-      [this.topPanel, mainIDEPanel, this.statusBar],
-      [0, 1, 0],
-      { direction: "top-to-bottom", spacing: 0 },
-    );
+    return this.createBoxLayout([this.topPanel, mainIDEPanel, this.statusBar], [0, 1, 0], {
+      direction: 'top-to-bottom',
+      spacing: 0,
+    });
   }
 }
