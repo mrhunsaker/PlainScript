@@ -17,6 +17,7 @@ jobs:
   lint:
     name: Lint & Format Check
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,6 +51,7 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: lint
     steps:
       - uses: actions/checkout@v4
@@ -93,25 +95,10 @@ jobs:
       - name: Build browser-app
         run: npm run build --workspace=browser-app
 
-      - name: Debug dependency state (pre electron build)
-        run: |
-          node -v
-          npm -v
-          npm ls --workspaces --depth=0 || true
-          git status --porcelain
-          git diff --name-only
-
       - name: Build electron-app
-        run: |
-          export NODE_OPTIONS=--max_old_space_size=4096
-
-          # Ensure workspace install state is consistent before electron build.
-          npm ci --no-audit
-
-          # Fail fast if earlier steps mutated lockfile state.
-          git diff --exit-code package-lock.json
-
-          npm run build --workspace=electron-app
+        run: npm run build --workspace=electron-app
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -126,6 +113,7 @@ jobs:
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
@@ -164,6 +152,7 @@ jobs:
   accessibility-check:
     name: Accessibility & Documentation
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4

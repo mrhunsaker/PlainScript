@@ -37,7 +37,8 @@
     "bundle": "npm run rebuild && npx theia build --mode development",
     "prepare:plugins": "node ./scripts/prepare-plugins.mjs",
     "package": "npm run build && npm run prepare:plugins && npx electron-builder",
-    "rebuild": "chmod +x ../node_modules/.bin/electron-rebuild 2>/dev/null || true; npx theia rebuild:electron --cacheRoot ..",
+    "package:only": "npx electron-builder",
+    "rebuild": "npx theia rebuild:electron --cacheRoot ..",
     "start": "npx theia start --plugins=local-dir:plugins",
     "watch": "npm run rebuild && npx theia build --watch --mode development"
   },
@@ -113,10 +114,18 @@
       "category": "Development"
     },
     "win": {
-      "icon": "resources/icons/plainscript.ico"
+      "icon": "resources/icons/plainscript.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
     },
     "mac": {
-      "icon": "resources/icons/plainscript.icns"
+      "icon": "resources/icons/plainscript.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "appImage": {
       "artifactName": "PlainScript-${version}-x86_64.AppImage"

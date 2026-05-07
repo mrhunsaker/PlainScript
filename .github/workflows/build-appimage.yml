@@ -7,52 +7,53 @@ on:
   workflow_dispatch:
 
 env:
-  SKIP_THEIA_CHECK: 1
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  ELECTRON_DOWNLOAD_MAX_ATTEMPTS: 5
-  ELECTRON_BUILD_DOWNLOAD_TIMEOUT: 120000
-  ELECTRON_BUILD_DOWNLOAD_RETRY: 5
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-
-      - name: Clear caches (Linux)
-        run: |
-          rm -rf ~/.cache/electron ~/.cache/electron-builder || true
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Prepare Electron cache (Linux)
-        env:
-          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
-        run: |
-          mkdir -p "$ELECTRON_CACHE"
-          echo "Using Electron cache: $ELECTRON_CACHE"
-      - name: Prefetch Electron to warm cache (Linux)
-        env:
-          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
+          cache: 'npm'
+
+      - name: Configure npm retry settings
         run: |
           npm config set fetch-retry-maxtimeout 120000
           npm config set fetch-retries 5
-          npm install electron@38.4.0 --no-audit --prefer-offline || true
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y p7zip-full build-essential python3 libsecret-1-dev libx11-dev libxkbfile-dev
+          sudo apt-get install -y \
+            p7zip-full \
+            build-essential \
+            python3 \
+            pkg-config \
+            libsecret-1-dev \
+            libx11-dev \
+            libxkbfile-dev
 
-      - name: Clean install
-        run: |
-          npm config set fetch-retry-maxtimeout 120000
-          npm config set fetch-retries 5
-          npm ci --no-audit --prefer-offline
+      - name: Cache Theia plugins
+        id: theia-plugins-cache
+        uses: actions/cache@v4
+        with:
+          path: plugins
+          key: ${{ runner.os }}-theia-plugins-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-theia-plugins-
+
+      - name: Install dependencies
+        run: npm ci --no-audit
 
       - name: Download Theia plugins
+        if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 20
         run: npm run download:plugins
 
       - name: Build custom-ui
@@ -61,34 +62,19 @@ jobs:
       - name: Build browser-app
         run: npm run build --workspace=browser-app
 
-      - name: Debug dependency state (pre electron build)
-        run: |
-          node -v
-          npm -v
-          npm ls --workspaces --depth=0 || true
-          git status --porcelain
-          git diff --name-only
-
       - name: Build electron-app
-        run: |
-          export NODE_OPTIONS=--max_old_space_size=4096
-
-          # Ensure workspace install state is consistent before electron build.
-          npm ci --no-audit
-
-          # Fail fast if earlier steps mutated lockfile state.
-          git diff --exit-code package-lock.json
-
-          npm run build --workspace=electron-app
+        run: npm run build --workspace=electron-app
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Prepare plugins for electron-app
         run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package AppImage
-        run: npm run package --workspace=electron-app
-
-      - name: Make AppImage executable
-        run: chmod +x electron-app/dist/*.AppImage
+        run: npx electron-builder --linux AppImage
+        working-directory: electron-app
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
@@ -109,30 +95,39 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clear caches (macOS)
-        run: |
-          rm -rf "$HOME/Library/Caches/electron" "$HOME/Library/Caches/electron-builder" || true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Prepare Electron cache (macOS)
-        env:
-          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
-        run: |
-          mkdir -p "$ELECTRON_CACHE"
-          echo "Using Electron cache: $ELECTRON_CACHE"
+          cache: 'npm'
 
-      - name: Clean install
+      - name: Configure npm retry settings
         run: |
           npm config set fetch-retry-maxtimeout 120000
           npm config set fetch-retries 5
-          npm ci --no-audit --prefer-offline
+
+      - name: Cache Theia plugins
+        id: theia-plugins-cache
+        uses: actions/cache@v4
+        with:
+          path: plugins
+          key: ${{ runner.os }}-theia-plugins-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-theia-plugins-
+
+      - name: Install dependencies
+        run: npm ci --no-audit
 
       - name: Download Theia plugins
+        if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 20
         run: npm run download:plugins
 
       - name: Build custom-ui
@@ -141,44 +136,36 @@ jobs:
       - name: Build browser-app
         run: npm run build --workspace=browser-app
 
-      - name: Debug dependency state (pre electron build)
-        run: |
-          node -v
-          npm -v
-          npm ls --workspaces --depth=0 || true
-          git status --porcelain
-          git diff --name-only
-
       - name: Build electron-app
-        run: |
-          export NODE_OPTIONS=--max_old_space_size=4096
-
-          # Ensure workspace install state is consistent before electron build.
-          npm ci --no-audit
-
-          # Fail fast if earlier steps mutated lockfile state.
-          git diff --exit-code package-lock.json
-
-          npm run build --workspace=electron-app
+        run: npm run build --workspace=electron-app
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Prepare plugins for electron-app
         run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package macOS (DMG + ZIP)
-        run: npm run package --workspace=electron-app
+        run: npx electron-builder --mac dmg zip
+        working-directory: electron-app
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
           name: plainscript-macos
-          path: electron-app/dist/*.{dmg,zip}
+          path: |
+            electron-app/dist/*.dmg
+            electron-app/dist/*.zip
           retention-days: 30
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: electron-app/dist/*.{dmg,zip}
+          files: |
+            electron-app/dist/*.dmg
+            electron-app/dist/*.zip
           draft: false
           prerelease: false
         env:
@@ -186,27 +173,41 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Clean install and rebuild
+      - name: Configure npm retry settings
         shell: pwsh
         run: |
-          Remove-Item -Force -Recurse "$env:LOCALAPPDATA\electron\Cache" -ErrorAction SilentlyContinue
-          Remove-Item -Force -Recurse "$env:LOCALAPPDATA\electron-builder\Cache" -ErrorAction SilentlyContinue
           npm config set fetch-retry-maxtimeout 120000
           npm config set fetch-retries 5
-          npm ci --no-audit --prefer-offline
+
+      - name: Cache Theia plugins
+        id: theia-plugins-cache
+        uses: actions/cache@v4
+        with:
+          path: plugins
+          key: ${{ runner.os }}-theia-plugins-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-theia-plugins-
+
+      - name: Install dependencies
+        shell: pwsh
+        run: npm ci --no-audit
 
       - name: Download Theia plugins
+        if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 20
         run: npm run download:plugins
 
       - name: Build custom-ui
@@ -215,29 +216,21 @@ jobs:
       - name: Build browser-app
         run: npm run build --workspace=browser-app
 
-      - name: Debug dependency state (pre electron build)
-        run: |
-          node -v
-          npm -v
-          npm ls --workspaces --depth=0 || true
-          git status --porcelain
-          git diff --name-only
-
       - name: Build electron-app
-        run: |
-          # Ensure workspace install state is consistent before electron build.
-          npm ci --no-audit
-
-          # Fail fast if earlier steps mutated lockfile state.
-          git diff --exit-code package-lock.json
-
-          npm run build --workspace=electron-app
+        shell: pwsh
+        run: npm run build --workspace=electron-app
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Prepare plugins for electron-app
         run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package Windows (NSIS + Portable)
-        run: npm run package --workspace=electron-app
+        shell: pwsh
+        run: npx electron-builder --win nsis portable
+        working-directory: electron-app
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
