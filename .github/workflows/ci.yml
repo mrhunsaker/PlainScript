@@ -99,7 +99,14 @@ jobs:
 
       - name: Build browser-app
         run: npm run build --workspace=browser-app
+        
+      - name: Refresh workspace install metadata
+        run: npm install --workspaces --include-workspace-root --no-audit
 
+      - name: Build electron-app
+        run: npm run build --workspace=electron-app
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
       - name: Build electron-app
         run: npm run build --workspace=electron-app
         env:
