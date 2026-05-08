@@ -99,9 +99,6 @@ jobs:
 
       - name: Build browser-app
         run: npm run build --workspace=browser-app
-        
-      - name: Refresh workspace install metadata
-        run: npm install --workspaces --include-workspace-root --no-audit
 
       - name: Build electron-app
         run: npm run build --workspace=electron-app
