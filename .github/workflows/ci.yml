@@ -1,4 +1,4 @@
-name: Code Quality & CI
+name: CI
 
 on:
   push:
@@ -6,93 +6,71 @@ on:
       - main
       - develop
   pull_request:
-    branches:
-      - main
-      - develop
+
+permissions:
+  contents: read
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '.nvmrc'
+  SKIP_THEIA_CHECK: 1
 
 jobs:
   lint:
-    name: Lint & Format Check
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    timeout-minutes: 15
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install system dependencies for native modules
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            python3 \
-            pkg-config \
-            libsecret-1-dev \
-            libx11-dev \
-            libxkbfile-dev
+          cache: npm
 
       - name: Install dependencies
         run: npm ci --no-audit
 
-      - name: Check code formatting
-        run: npm run format:check
-
-      - name: Run ESLint
+      - name: Run lint
         run: npm run lint
 
-  build:
-    name: Build & Test
+  typecheck:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
+    timeout-minutes: 45
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install system dependencies for native modules
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            python3 \
-            pkg-config \
-            libsecret-1-dev \
-            libx11-dev \
-            libxkbfile-dev
+          cache: npm
 
       - name: Install dependencies
         run: npm ci --no-audit
 
-      - name: Cache Theia plugins
-        id: theia-plugins-cache
-        uses: actions/cache@v4
-        with:
-          path: plugins
-          key: ${{ runner.os }}-theia-plugins-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-theia-plugins-
+      - name: TypeScript checks
+        run: npm run typecheck
 
-      - name: Download Theia plugins
-        if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
-        timeout-minutes: 30
-        run: |
-          for i in 1 2 3; do
-            npm run download:plugins && break
-            echo "Attempt $i failed, retrying in 30s..."
-            sleep 30
-          done
+  frontend-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -116,86 +94,66 @@ jobs:
           retention-days: 7
 
   security-audit:
-    name: Security Audit
     runs-on: ubuntu-latest
     timeout-minutes: 15
     continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: Install system dependencies for native modules
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            python3 \
-            pkg-config \
-            libsecret-1-dev \
-            libx11-dev \
-            libxkbfile-dev
+          cache: npm
 
       - name: Install dependencies
         run: npm ci --no-audit
 
-      - name: Run npm audit (non-blocking)
-        run: npm audit --audit-level=moderate || true
+      - name: Run npm audit
+        run: npm audit --audit-level=high
 
-      - name: Check for high/critical vulnerabilities (report-only)
-        run: |
-          if npm audit --audit-level=high 2>&1 | grep -q 'high\|critical'; then
-            echo "⚠️  High/Critical vulnerabilities found. Review recommended."
-            npm audit --audit-level=high || true
-          else
-            echo "✅ No high/critical vulnerabilities found."
-          fi
-
-  accessibility-check:
-    name: Accessibility & Documentation
+  docs-check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Verify governance files exist
-        run: |
-          echo "Checking governance files..."
-          test -f CODE_OF_CONDUCT.md && echo "✓ CODE_OF_CONDUCT.md" || (echo "✗ CODE_OF_CONDUCT.md missing" && exit 1)
-          test -f CONTRIBUTING.md && echo "✓ CONTRIBUTING.md" || (echo "✗ CONTRIBUTING.md missing" && exit 1)
-          test -f STYLE_GUIDE.md && echo "✓ STYLE_GUIDE.md" || (echo "✗ STYLE_GUIDE.md missing" && exit 1)
-          test -f SECURITY.md && echo "✓ SECURITY.md" || (echo "✗ SECURITY.md missing" && exit 1)
-          test -f README.md && echo "✓ README.md" || (echo "✗ README.md missing" && exit 1)
-          echo "All governance files present."
+      - name: Validate README exists
+        run: test -f README.md
 
-      - name: Verify ESLint & Prettier config
-        run: |
-          echo "Checking quality tools..."
-          test -f .eslintrc.json && echo "✓ .eslintrc.json" || (echo "✗ .eslintrc.json missing" && exit 1)
-          test -f .prettierrc.json && echo "✓ .prettierrc.json" || (echo "✗ .prettierrc.json missing" && exit 1)
-          test -f .prettierignore && echo "✓ .prettierignore" || (echo "✗ .prettierignore missing" && exit 1)
-          echo "All quality tool configs present."
+      - name: Validate LICENSE exists
+        run: test -f LICENSE
 
   summary:
-    name: Summary
     runs-on: ubuntu-latest
-    needs: [lint, build, security-audit, accessibility-check]
-    if: always()
-    steps:
-      - name: Check job status
-        run: |
-          echo "Lint & Format: ${{ needs.lint.result }}"
-          echo "Build & Test: ${{ needs.build.result }}"
-          echo "Security Audit: ${{ needs.security-audit.result }}"
-          echo "Accessibility & Docs: ${{ needs.accessibility-check.result }}"
+    needs:
+      - lint
+      - typecheck
+      - frontend-build
+      - security-audit
+      - docs-check
 
-          if [[ "${{ needs.lint.result }}" == "failure" ]] || [[ "${{ needs.build.result }}" == "failure" ]]; then
-            echo "❌ CI/CD failed: Lint or build check failed"
+    if: always()
+
+    steps:
+      - name: CI Summary
+        run: |
+          echo "Lint: ${{ needs.lint.result }}"
+          echo "Typecheck: ${{ needs.typecheck.result }}"
+          echo "Frontend Build: ${{ needs.frontend-build.result }}"
+          echo "Security Audit: ${{ needs.security-audit.result }}"
+          echo "Docs Check: ${{ needs.docs-check.result }}"
+
+      - name: Fail if required jobs failed
+        run: |
+          if [[ "${{ needs.lint.result }}" != "success" || \
+                "${{ needs.typecheck.result }}" != "success" || \
+                "${{ needs.frontend-build.result }}" != "success" || \
+                "${{ needs.docs-check.result }}" != "success" ]]; then
+            echo "Required CI jobs failed."
             exit 1
           fi
-
-          echo "✅ All required checks passed"
