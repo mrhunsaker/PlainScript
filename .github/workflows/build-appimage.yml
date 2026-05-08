@@ -7,93 +7,54 @@ on:
   workflow_dispatch:
 
 env:
+  SKIP_THEIA_CHECK: 1
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ELECTRON_DOWNLOAD_MAX_ATTEMPTS: 5
+  ELECTRON_BUILD_DOWNLOAD_TIMEOUT: 120000
+  ELECTRON_BUILD_DOWNLOAD_RETRY: 5
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   build-linux:
     runs-on: ubuntu-latest
-    needs: [create-release]
-    if: always() && !failure() && !cancelled()
-    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+
+      - name: Clear caches (Linux)
+        run: |
+          rm -rf ~/.cache/electron ~/.cache/electron-builder || true
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-
-      - name: Configure npm
+      - name: Prepare Electron cache (Linux)
+        env:
+          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
         run: |
-          npm config set fetch-retry-maxtimeout 300000
-          npm config set fetch-retry-mintimeout 10000
+          mkdir -p "$ELECTRON_CACHE"
+          echo "Using Electron cache: $ELECTRON_CACHE"
+      - name: Prefetch Electron to warm cache (Linux)
+        env:
+          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
+        run: |
+          npm config set fetch-retry-maxtimeout 120000
           npm config set fetch-retries 5
+          npm install electron@38.4.0 --no-audit --prefer-offline || true
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
-            p7zip-full \
-            build-essential \
-            python3 \
-            pkg-config \
-            libsecret-1-dev \
-            libx11-dev \
-            libxkbfile-dev
+          sudo apt-get install -y p7zip-full build-essential python3 libsecret-1-dev libx11-dev libxkbfile-dev
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node-cache
-        with:
-          path: |
-            node_modules
-            browser-app/node_modules
-            electron-app/node_modules
-            custom-ui/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: npm ci --no-audit
-
-      - name: Cache Theia plugins
-        id: theia-plugins-cache
-        uses: actions/cache@v4
-        with:
-          path: plugins
-          key: ${{ runner.os }}-theia-plugins-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-theia-plugins-
+      - name: Clean install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-retries 5
+          npm install --no-audit --prefer-offline
 
       - name: Download Theia plugins
-        if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
-        timeout-minutes: 45
-        run: |
-          for i in 1 2 3; do
-            npm run download:plugins && exit 0
-            echo "Attempt $i failed or stalled, retrying in 30s..."
-            sleep 30
-          done
-          echo "Download Theia plugins failed after 3 attempts."
-          exit 1
+        run: npm run download:plugins
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -102,18 +63,18 @@ jobs:
         run: npm run build --workspace=browser-app
 
       - name: Build electron-app
-        run: npm run build --workspace=electron-app
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+        run: |
+          export NODE_OPTIONS=--max_old_space_size=4096
+          npm run build --workspace=electron-app
 
       - name: Prepare plugins for electron-app
         run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package AppImage
-        run: npx electron-builder --linux AppImage
-        working-directory: electron-app
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+        run: npm run package --workspace=electron-app
+
+      - name: Make AppImage executable
+        run: chmod +x electron-app/dist/*.AppImage
 
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@v4
@@ -122,75 +83,43 @@ jobs:
           path: electron-app/dist/*.AppImage
           retention-days: 30
 
-      - name: Attach AppImage to Release
+      - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: electron-app/dist/*.AppImage
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
     runs-on: macos-latest
-    needs: [create-release]
-    if: always() && !failure() && !cancelled()
-    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: Clear caches (macOS)
+        run: |
+          rm -rf "$HOME/Library/Caches/electron" "$HOME/Library/Caches/electron-builder" || true
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-
-      - name: Configure npm
+      - name: Prepare Electron cache (macOS)
+        env:
+          ELECTRON_CACHE: $RUNNER_TEMP/electron-cache
         run: |
-          npm config set fetch-retry-maxtimeout 300000
-          npm config set fetch-retry-mintimeout 10000
-          npm config set fetch-retries 5
+          mkdir -p "$ELECTRON_CACHE"
+          echo "Using Electron cache: $ELECTRON_CACHE"
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node-cache
-        with:
-          path: |
-            node_modules
-            browser-app/node_modules
-            electron-app/node_modules
-            custom-ui/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        run: npm ci --no-audit
-
-      - name: Cache Theia plugins
-        id: theia-plugins-cache
-        uses: actions/cache@v4
-        with:
-          path: plugins
-          key: ${{ runner.os }}-theia-plugins-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-theia-plugins-
+      - name: Clean install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm config set fetch-retry-maxtimeout 120000
+          npm install
 
       - name: Download Theia plugins
-        if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
-        timeout-minutes: 60
-        run: |
-          for i in 1 2 3 4 5; do
-            echo "Download attempt $i..."
-            npm run download:plugins && exit 0
-            echo "Attempt $i failed. Waiting 60s before retry..."
-            sleep 60
-          done
-          echo "Download Theia plugins failed after 5 attempts."
-          exit 1
+        run: npm run download:plugins
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -199,123 +128,59 @@ jobs:
         run: npm run build --workspace=browser-app
 
       - name: Build electron-app
-        run: npm run build --workspace=electron-app
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+        run: |
+          export NODE_OPTIONS=--max_old_space_size=4096
+          npm run build --workspace=electron-app
 
       - name: Prepare plugins for electron-app
         run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package macOS (DMG + ZIP)
-        run: npx electron-builder --mac dmg zip
-        working-directory: electron-app
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+        run: npm run package --workspace=electron-app
 
       - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
           name: plainscript-macos
-          path: |
-            electron-app/dist/*.dmg
-            electron-app/dist/*.zip
+          path: electron-app/dist/*.{dmg,zip}
           retention-days: 30
 
-      - name: Attach macOS artifacts to Release
+      - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            electron-app/dist/*.dmg
-            electron-app/dist/*.zip
+          files: electron-app/dist/*.{dmg,zip}
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-windows:
     runs-on: windows-latest
-    needs: [create-release]
-    if: always() && !failure() && !cancelled()
-    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11'
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Configure npm
+      - name: Clean install and rebuild
         shell: pwsh
         run: |
-          npm config set fetch-retry-maxtimeout 300000
-          npm config set fetch-retry-mintimeout 10000
+          Remove-Item -Force -Recurse "$env:LOCALAPPDATA\electron\Cache" -ErrorAction SilentlyContinue
+          Remove-Item -Force -Recurse "$env:LOCALAPPDATA\electron-builder\Cache" -ErrorAction SilentlyContinue
+          Remove-Item -Force -Recurse node_modules -ErrorAction SilentlyContinue
+          if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
+          npm config set fetch-retry-maxtimeout 120000
           npm config set fetch-retries 5
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node-cache
-        with:
-          path: |
-            node_modules
-            browser-app/node_modules
-            electron-app/node_modules
-            custom-ui/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
-        shell: pwsh
-        timeout-minutes: 45
-        run: |
-          $attempts = 0
-          $maxAttempts = 3
-          do {
-            $attempts++
-            Write-Host "npm ci attempt $attempts of $maxAttempts..."
-            npm ci --no-audit
-            if ($LASTEXITCODE -eq 0) {
-              Write-Host "npm ci succeeded."
-              exit 0
-            }
-            if ($attempts -lt $maxAttempts) {
-              Write-Host "Attempt $attempts failed (exit $LASTEXITCODE). Clearing npm cache and retrying in 30s..."
-              npm cache clean --force 2>$null
-              Start-Sleep -Seconds 30
-            }
-          } while ($attempts -lt $maxAttempts)
-          Write-Error "npm ci failed after $maxAttempts attempts."
-          exit 1
-
-      - name: Cache Theia plugins
-        id: theia-plugins-cache
-        uses: actions/cache@v4
-        with:
-          path: plugins
-          key: ${{ runner.os }}-theia-plugins-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-theia-plugins-
+          npm install --no-audit --prefer-offline
 
       - name: Download Theia plugins
-        if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
-        timeout-minutes: 60
-        shell: pwsh
-        run: |
-          for ($i = 1; $i -le 5; $i++) {
-            Write-Host "Download attempt $i..."
-            npm run download:plugins
-            if ($LASTEXITCODE -eq 0) {
-              exit 0
-            }
-            Write-Host "Attempt $i failed. Waiting 60s before retry..."
-            Start-Sleep -Seconds 60
-          }
-          throw "Download Theia plugins failed after 5 attempts."
+        run: npm run download:plugins
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
@@ -324,20 +189,13 @@ jobs:
         run: npm run build --workspace=browser-app
 
       - name: Build electron-app
-        shell: pwsh
         run: npm run build --workspace=electron-app
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Prepare plugins for electron-app
         run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package Windows (NSIS + Portable)
-        shell: pwsh
-        run: npx electron-builder --win nsis portable
-        working-directory: electron-app
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+        run: npm run package --workspace=electron-app
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -346,10 +204,12 @@ jobs:
           path: electron-app/dist/*.exe
           retention-days: 30
 
-      - name: Attach Windows artifacts to Release
+      - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: electron-app/dist/*.exe
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
