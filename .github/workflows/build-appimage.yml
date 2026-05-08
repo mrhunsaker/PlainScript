@@ -39,9 +39,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Configure npm retry settings
+      - name: Configure npm
         run: |
-          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-retry-maxtimeout 300000
+          npm config set fetch-retry-mintimeout 10000
           npm config set fetch-retries 5
 
       - name: Install system dependencies
@@ -56,6 +57,23 @@ jobs:
             libx11-dev \
             libxkbfile-dev
 
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+            browser-app/node_modules
+            electron-app/node_modules
+            custom-ui/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm ci --no-audit
+
       - name: Cache Theia plugins
         id: theia-plugins-cache
         uses: actions/cache@v4
@@ -64,9 +82,6 @@ jobs:
           key: ${{ runner.os }}-theia-plugins-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-theia-plugins-
-
-      - name: Install dependencies
-        run: npm ci --no-audit
 
       - name: Download Theia plugins
         if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
@@ -119,7 +134,7 @@ jobs:
     runs-on: macos-latest
     needs: [create-release]
     if: always() && !failure() && !cancelled()
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -132,10 +147,28 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Configure npm retry settings
+      - name: Configure npm
         run: |
-          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-retry-maxtimeout 300000
+          npm config set fetch-retry-mintimeout 10000
           npm config set fetch-retries 5
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+            browser-app/node_modules
+            electron-app/node_modules
+            custom-ui/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm ci --no-audit
 
       - name: Cache Theia plugins
         id: theia-plugins-cache
@@ -146,19 +179,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-theia-plugins-
 
-      - name: Install dependencies
-        run: npm ci --no-audit
-
       - name: Download Theia plugins
         if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
-        timeout-minutes: 45
+        timeout-minutes: 60
         run: |
-          for i in 1 2 3; do
+          for i in 1 2 3 4 5; do
+            echo "Download attempt $i..."
             npm run download:plugins && exit 0
-            echo "Attempt $i failed or stalled, retrying in 30s..."
-            sleep 30
+            echo "Attempt $i failed. Waiting 60s before retry..."
+            sleep 60
           done
-          echo "Download Theia plugins failed after 3 attempts."
+          echo "Download Theia plugins failed after 5 attempts."
           exit 1
 
       - name: Build custom-ui
@@ -204,7 +235,7 @@ jobs:
     runs-on: windows-latest
     needs: [create-release]
     if: always() && !failure() && !cancelled()
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -217,11 +248,49 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Configure npm retry settings
+      - name: Configure npm
         shell: pwsh
         run: |
-          npm config set fetch-retry-maxtimeout 120000
+          npm config set fetch-retry-maxtimeout 300000
+          npm config set fetch-retry-mintimeout 10000
           npm config set fetch-retries 5
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            node_modules
+            browser-app/node_modules
+            electron-app/node_modules
+            custom-ui/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        shell: pwsh
+        timeout-minutes: 45
+        run: |
+          $attempts = 0
+          $maxAttempts = 3
+          do {
+            $attempts++
+            Write-Host "npm ci attempt $attempts of $maxAttempts..."
+            npm ci --no-audit
+            if ($LASTEXITCODE -eq 0) {
+              Write-Host "npm ci succeeded."
+              exit 0
+            }
+            if ($attempts -lt $maxAttempts) {
+              Write-Host "Attempt $attempts failed (exit $LASTEXITCODE). Clearing npm cache and retrying in 30s..."
+              npm cache clean --force 2>$null
+              Start-Sleep -Seconds 30
+            }
+          } while ($attempts -lt $maxAttempts)
+          Write-Error "npm ci failed after $maxAttempts attempts."
+          exit 1
 
       - name: Cache Theia plugins
         id: theia-plugins-cache
@@ -232,38 +301,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-theia-plugins-
 
-      - name: Install dependencies
-        shell: pwsh
-        timeout-minutes: 45
-        run: |
-          for ($i = 1; $i -le 3; $i++) {
-            npm ci --no-audit
-            if ($LASTEXITCODE -eq 0) {
-              exit 0
-            }
-
-            Write-Host "Attempt $i failed or stalled, retrying in 30s..."
-            Start-Sleep -Seconds 30
-          }
-
-          throw "npm ci failed after 3 attempts."
-
       - name: Download Theia plugins
         if: steps.theia-plugins-cache.outputs.cache-hit != 'true'
-        timeout-minutes: 45
+        timeout-minutes: 60
         shell: pwsh
         run: |
-          for ($i = 1; $i -le 3; $i++) {
+          for ($i = 1; $i -le 5; $i++) {
+            Write-Host "Download attempt $i..."
             npm run download:plugins
             if ($LASTEXITCODE -eq 0) {
               exit 0
             }
-
-            Write-Host "Attempt $i failed or stalled, retrying in 30s..."
-            Start-Sleep -Seconds 30
+            Write-Host "Attempt $i failed. Waiting 60s before retry..."
+            Start-Sleep -Seconds 60
           }
-
-          throw "Download Theia plugins failed after 3 attempts."
+          throw "Download Theia plugins failed after 5 attempts."
 
       - name: Build custom-ui
         run: npm run build --workspace=custom-ui
