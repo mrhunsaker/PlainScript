@@ -33,8 +33,8 @@
     "electron-builder": "^24.13.3"
   },
   "scripts": {
-    "build": "npm run rebuild && npx theia build --mode production",
-    "bundle": "npm run rebuild && npx theia build --mode development",
+    "build": "npm install --workspaces --include-workspace-root && npm run rebuild && npx theia build --mode production",
+    "bundle": "npm install --workspaces --include-workspace-root && npm run rebuild && npx theia build --mode development"
     "prepare:plugins": "node ./scripts/prepare-plugins.mjs",
     "package": "npm run build && npm run prepare:plugins && npx electron-builder",
     "package:only": "npx electron-builder",
