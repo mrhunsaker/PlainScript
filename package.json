@@ -8,6 +8,7 @@
     "build": "turbo run build",
     "start": "turbo start",
     "watch": "turbo run watch",
+    "typecheck": "npm run typecheck --workspace=custom-ui",
     "docs:install": "python3 -m pip install -r docs/requirements.txt",
     "docs:build": "python3 -m mkdocs build --strict",
     "docs:serve": "python3 -m mkdocs serve -a 127.0.0.1:8000",
