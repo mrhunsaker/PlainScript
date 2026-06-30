@@ -9,21 +9,21 @@
     "src"
   ],
   "dependencies": {
-    "@theia/core": "1.67.0"
+    "@theia/core": "1.73.0"
   },
   "devDependencies": {
-    "@theia/filesystem": "1.67.0",
-    "@theia/navigator": "1.67.0",
-    "@theia/output": "1.67.0",
-    "@theia/search-in-workspace": "1.67.0",
-    "@theia/terminal": "1.67.0",
-    "@theia/test": "1.67.0",
+    "@theia/filesystem": "1.73.0",
+    "@theia/navigator": "1.73.0",
+    "@theia/output": "1.73.0",
+    "@theia/search-in-workspace": "1.73.0",
+    "@theia/terminal": "1.73.0",
+    "@theia/test": "1.73.0",
     "@theia/workspace": "1.73.0",
     "@vitejs/plugin-react": "^5.1.2",
     "less": "^4.6.4",
     "rimraf": "^5.0.0",
-    "typescript": "~5.4.5",
-    "vite": "^8.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.2",
     "vite-plugin-lib-inject-css": "^2.2.2"
   },
   "scripts": {

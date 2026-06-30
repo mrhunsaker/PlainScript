@@ -37,11 +37,24 @@
   ],
   "packageManager": "npm@11.0.0",
   "dependencies": {
-    "@vscode/ripgrep": "^1.17.0"
+    "@vscode/ripgrep": "^1.17.0",
+    "cpu-features": "^0.0.10",
+    "find-git-repositories": "^0.2.2",
+    "puppeteer-core": "^23.11.0",
+    "ssh2": "^1.17.0"
   },
   "overrides": {
     "@vscode/ripgrep": "^1.17.0",
-    "@theia/monaco-editor-core": "1.96.302"
+    "@theia/monaco-editor-core": "1.108.201",
+    "cross-spawn": "^7.0.6",
+    "tmp": "^0.2.5",
+    "ws": "^8.18.3",
+    "elliptic": "^6.6.1",
+    "semver": "^7.7.3",
+    "@theia/cli": {
+      "puppeteer": "23.11.0",
+      "puppeteer-core": "23.11.0"
+    }
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
@@ -51,20 +64,26 @@
     "oderwat.indent-rainbow": "https://open-vsx.org/api/oderwat/indent-rainbow/8.3.1/file/oderwat.indent-rainbow-8.3.1.vsix"
   },
   "devDependencies": {
+    "@types/yargs": "17",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
-    "copy-webpack-plugin": "8.1.1",
+    "copy-webpack-plugin": "^13.0.1",
+    "cross-env": "^7.0.3",
+    "electron": "^39.8.7",
     "eslint": "^9.11.0",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "rimraf": "6.0.1",
-    "turbo": "^2.9.14",
+    "shx": "^0.3.4",
+    "terser-webpack-plugin": "^5.6.1",
+    "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "yargs": "17",
-    "@types/yargs": "17",
-    "cross-env": "^7.0.3",
-    "shx": "^0.3.4"
+    "yargs": "17"
+  },
+  "volta": {
+    "node": "20.19.0",
+    "npm": "11.18.0"
   }
 }
