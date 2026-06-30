@@ -1,0 +1,26 @@
+diff --git a/electron-app/package.json b/electron-app/package.json
+index 0000000..0000000 100644
+--- a/electron-app/package.json
++++ b/electron-app/package.json
+@@ -38,6 +38,9 @@
+     "prepare:plugins": "node ./scripts/prepare-plugins.mjs",
+     "package": "npm run build && npm run prepare:plugins && npx electron-builder",
+     "package:only": "npx electron-builder",
++    "package:linux": "npx electron-builder --linux",
++    "package:mac": "npx electron-builder --mac",
++    "package:win": "npx electron-builder --win",
+     "rebuild": "npx theia rebuild:electron --cacheRoot ..",
+     "start": "npx theia start --plugins=local-dir:plugins",
+     "watch": "npm run rebuild && npx theia build --watch --mode development"
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index 0000000..0000000 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -35,7 +35,6 @@
+             build_cmd: npm run package:win --workspace=electron-app
+             artifact_path: |
+               electron-app/dist/*.exe
+-              electron-app/dist/*.msi
+ 
+     runs-on: ${{ matrix.os }}
+     timeout-minutes: 90

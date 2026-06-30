@@ -84,8 +84,8 @@ Constructor-injected dependencies use `@inject()` with Theia's service identifie
 
 ## CI/CD Pipelines
 
-| Workflow             | Trigger                        | Purpose                                             |
-| -------------------- | ------------------------------ | --------------------------------------------------- |
-| `ci.yml`             | Push / PR to `main`, `develop` | Lint + build (required status checks)               |
-| `build-appimage.yml` | Push of `v*` tag               | Build Linux AppImage, macOS DMG, Windows NSIS       |
-| `docs.yml`           | Push to `main`                 | Build and deploy this documentation to GitHub Pages |
+| Workflow      | Trigger                          | Purpose                                                        |
+| ------------- | -------------------------------- | -------------------------------------------------------------- |
+| `ci.yml`      | Push / PR to `main`, `develop`   | Lint, typecheck, `npm audit`, and frontend bundle build        |
+| `release.yml` | Push of `v*` tag                 | Build Linux AppImage, macOS DMG/ZIP, Windows NSIS/portable EXE |
+| `docs.yml`    | Push to `main`, push of `v*` tag | Build and deploy this documentation to GitHub Pages            |

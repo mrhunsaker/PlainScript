@@ -45,14 +45,20 @@ npm run build
 
 ## Documentation Sections
 
-| Section                               | Description                                    |
-| ------------------------------------- | ---------------------------------------------- |
-| [Getting Started](getting-started.md) | Prerequisites, build steps, first launch       |
-| [Installation](installation.md)       | Platform-specific install instructions         |
-| [Architecture](architecture.md)       | Monorepo structure and design decisions        |
-| [API Reference](api/index.md)         | All exported classes, functions, and constants |
-| [Contributing](contributing.md)       | How to contribute code and report issues       |
-| [Changelog](changelog.md)             | Release history                                |
+| Section                                   | Description                                     |
+| ----------------------------------------- | ----------------------------------------------- |
+| [Getting Started](getting-started.md)     | Prerequisites, build steps, first launch        |
+| [Installation](installation.md)           | Platform-specific install instructions          |
+| [Quick Reference](quick-reference.md)     | Launch commands and common tasks at a glance    |
+| [Architecture](architecture.md)           | Monorepo structure and design decisions         |
+| [API Reference](api/index.md)             | All exported classes, functions, and constants  |
+| [Packaging & Distribution](packaging.md)  | Building installers for macOS, Windows, Linux   |
+| [Contributing](contributing.md)           | How to contribute code and report issues        |
+| [Style Guide](style-guide.md)             | Coding style and conventions                    |
+| [Governance & Enforcement](governance.md) | How code quality and accessibility are enforced |
+| [Code of Conduct](code-of-conduct.md)     | Community standards and expectations            |
+| [Security Policy](security.md)            | How to report vulnerabilities                   |
+| [Changelog](changelog.md)                 | Release history                                 |
 
 ---
 

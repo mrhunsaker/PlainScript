@@ -28,8 +28,17 @@ npm install
 `npm install` will:
 
 1. Install root devDependencies (TypeScript, ESLint, Prettier, Husky, Turbo).
-2. Run `scripts/postinstall.js` to download bundled VS Code–compatible plugins into `plugins/`.
+2. Run `scripts/postinstall.js`, which performs a non-fatal Theia version compatibility check.
 3. Install dependencies in each workspace (`custom-ui`, `browser-app`, `electron-app`).
+
+Plugins are **not** downloaded automatically — run this explicitly afterwards:
+
+```bash
+npm run download:plugins
+```
+
+This fetches the VS Code–compatible extensions listed in root `package.json`'s `theiaPlugins` field
+into `plugins/`.
 
 ---
 

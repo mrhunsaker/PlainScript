@@ -39,6 +39,9 @@
     "prepare:plugins": "node ./scripts/prepare-plugins.mjs",
     "package": "npm run build && npm run prepare:plugins && npx electron-builder",
     "package:only": "npx electron-builder",
+    "package:linux": "npx electron-builder --linux",
+    "package:mac": "npx electron-builder --mac",
+    "package:win": "npx electron-builder --win",
     "rebuild": "npx theia rebuild:electron --cacheRoot ..",
     "start": "npx theia start --plugins=local-dir:plugins",
     "watch": "npm run rebuild && npx theia build --watch --mode development"

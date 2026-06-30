@@ -1,0 +1,53 @@
+--- /tmp/orig_mkdocs.yml	2026-06-30 19:50:45.667861647 +0000
++++ mkdocs.yml	2026-06-30 19:50:29.099147876 +0000
+@@ -7,6 +7,12 @@
+ repo_url: https://github.com/mrhunsaker/PlainScript
+ edit_uri: edit/main/docs/
+ 
++validation:
++  links:
++    not_found: info
++    absolute_links: info
++    unrecognized_links: info
++
+ theme:
+   name: material
+   palette:
+@@ -61,7 +67,11 @@
+       line_spans: __span
+       pygments_lang_class: true
+   - pymdownx.inlinehilite
+-  - pymdownx.snippets
++  - pymdownx.snippets:
++      base_path:
++        - '.'
++        - 'docs'
++      check_paths: true
+   - pymdownx.superfences:
+       custom_fences:
+         - name: mermaid
+@@ -78,7 +88,8 @@
+   - Getting Started:
+       - Overview: getting-started.md
+       - Installation: installation.md
+-      - Architecture: architecture.md
++      - Quick Reference: quick-reference.md
++  - Architecture: architecture.md
+   - API Reference:
+       - Overview: api/index.md
+       - Module Entry Point: api/module-index.md
+@@ -88,7 +99,13 @@
+       - Keyboard Shortcuts: api/keyboard-shortcuts-contribution.md
+       - Navigator Widget: api/navigator-widget-factory.md
+       - Output Toolbar: api/output-toolbar-contribution.md
+-  - Contributing: contributing.md
++  - Packaging & Distribution: packaging.md
++  - Contributing:
++      - Overview: contributing.md
++      - Style Guide: style-guide.md
++      - Governance & Enforcement: governance.md
++      - Code of Conduct: code-of-conduct.md
++      - Security Policy: security.md
+   - Changelog: changelog.md
+ 
+ extra:

@@ -1,30 +1,12 @@
-# Contributing
+!!! tip "Editing these docs" If you change anything under `docs/` or this site's structure, validate
+it builds before opening a PR:
 
-PlainScript welcomes improvements that preserve the project's core values:
+    ```bash
+    pip install -r docs/requirements.txt
+    mkdocs build --strict
+    ```
 
-- Accessibility first
-- Simplicity over feature bloat
-- Clear and maintainable architecture
+    See also: [Style Guide](style-guide.md), [Governance & Enforcement](governance.md),
+    [Code of Conduct](code-of-conduct.md).
 
-For full contribution guidelines, see the repository document:
-
-- [CONTRIBUTING.md](https://github.com/mrhunsaker/PlainScript/blob/main/CONTRIBUTING.md)
-
----
-
-## Local Validation Checklist
-
-Run these commands before opening a PR:
-
-```bash
-npm run lint
-npm run format:check
-npm run build
-```
-
-If you changed documentation:
-
-```bash
-pip install -r docs/requirements.txt
-mkdocs build --strict
-```
+--8<-- "CONTRIBUTING.md"

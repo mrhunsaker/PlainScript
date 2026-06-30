@@ -36,7 +36,6 @@ jobs:
             build_cmd: npm run package:win --workspace=electron-app
             artifact_path: |
               electron-app/dist/*.exe
-              electron-app/dist/*.msi
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
