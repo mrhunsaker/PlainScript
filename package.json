@@ -16,7 +16,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write '**/*.{ts,tsx,js,jsx,json,md,less}'",
     "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md,less}'",
-    "prepare": "node -e \"if (!process.env.CI) require('child_process').execSync('node ./node_modules/husky/bin.js', { stdio: 'inherit' })\"",
+    "prepare": "node ./scripts/prepare.js",
     "postinstall": "node ./scripts/postinstall.js",
     "clean": "turbo run clean && rimraf node_modules",
     "download:plugins": "theia download:plugins --rate-limit=5 --parallel=false --ignore-errors && node ./scripts/verify-plugins.js",
