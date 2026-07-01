@@ -92,9 +92,7 @@ jobs:
         run: npm ci --no-audit --ignore-scripts
 
       - name: Build frontend workspaces only (skip electron native rebuilds)
-        run:
-          npx turbo run build --filter=...custom-ui --filter=...browser-app
-          --filter='!(...electron-app)'
+        run: npx turbo run build --filter=custom-ui --filter=browser-app --filter=!electron-app
         env:
           NODE_OPTIONS: --max_old_space_size=4096
           THEIA_SKIP_NATIVE_REBUILD: 1
