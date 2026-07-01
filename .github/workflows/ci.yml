@@ -26,6 +26,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Ensure we're in the right directory
+          path: .
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -33,18 +36,29 @@ jobs:
           node-version-file: '.nvmrc'
           cache: npm
 
-      - name: Verify workspace structure
+      - name: Verify workspace before install
         run: |
-          pwd
+          echo "Current directory: $(pwd)"
           ls -la
-          test -d browser-app
-          test -d custom-ui
-          test -d electron-app
-          test -f package.json
+          test -f package.json || { echo "package.json missing!"; exit 1; }
 
       - name: Install dependencies (no lifecycle scripts)
         run: npm ci --no-audit --ignore-scripts
+        # Add this to prevent deletion
+        env:
+          npm_config_ignore_scripts: true
 
+      - name: Verify workspace after install
+        run: |
+          echo "Current directory after npm ci: $(pwd)"
+          ls -la
+          test -f package.json || { echo "package.json missing after npm ci!"; exit 1; }
+          test -f README.md || { echo "README.md missing after npm ci!"; exit 1; }
+          test -d browser-app || { echo "browser-app missing!"; exit 1; }
+          test -d custom-ui || { echo "custom-ui missing!"; exit 1; }
+          test -d electron-app || { echo "electron-app missing!"; exit 1; }
+
+      # ... rest of your steps
       - name: Validate docs exist
         run: |
           test -f README.md
