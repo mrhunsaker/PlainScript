@@ -37,8 +37,12 @@ jobs:
             artifact_path: |
               electron-app/dist/*.exe
 
+jobs:
+  build:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: electron-app
 
     steps:
       - name: Checkout
@@ -103,7 +107,7 @@ jobs:
             .cache/electron
             .cache/electron-builder
             plugins
-          key: ${{ runner.os }}-electron-${{ hashFiles('package-lock.json') }}
+          key: ${{ runner.os }}-electron-${{ hashFiles('electron-app/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-electron-
 
