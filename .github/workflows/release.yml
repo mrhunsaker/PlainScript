@@ -10,8 +10,8 @@ permissions:
 
 env:
   SKIP_THEIA_CHECK: 1
-  ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
-  ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+  ELECTRON_CACHE: ${{ github.workspace }}/electron-app/.cache/electron
+  ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/electron-app/.cache/electron-builder
 
 jobs:
   build:
@@ -21,25 +21,25 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: linux
-            build_cmd: npm run package:linux --workspace=electron-app
-            artifact_path: electron-app/dist/*.AppImage
+            build_cmd: npm run package:linux
+            artifact_path: dist/*.AppImage
 
           - os: macos-latest
             artifact_name: macos
-            build_cmd: npm run package:mac --workspace=electron-app
+            build_cmd: npm run package:mac
             artifact_path: |
-              electron-app/dist/*.dmg
-              electron-app/dist/*.zip
+              dist/*.dmg
+              dist/*.zip
 
           - os: windows-latest
             artifact_name: windows
-            build_cmd: npm run package:win --workspace=electron-app
+            build_cmd: npm run package:win
             artifact_path: |
-              electron-app/dist/*.exe
+              dist/*.exe
 
-jobs:
-  build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+
     defaults:
       run:
         working-directory: electron-app
@@ -51,21 +51,25 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22 # Must be >= 22.12.0 for @electron/rebuild
+          node-version-file: '.nvmrc'
           cache: npm
+          cache-dependency-path: electron-app/package-lock.json
 
-      # === CRITICAL: Install all system dependencies ===
+      - name: Setup Python (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
+
           sudo apt-get install -y \
             build-essential \
             python3 \
-            python3-pip \
-            python3-dev \
             pkg-config \
-            libssl-dev \
             libsecret-1-dev \
             libx11-dev \
             libxkbfile-dev \
@@ -84,50 +88,33 @@ jobs:
             libgbm-dev \
             p7zip-full
 
-      - name: Install macOS dependencies
-        if: runner.os == 'macOS'
-        run: |
-          brew install pkg-config
-          # Xcode command line tools are auto-installed by GitHub Actions
-
-      - name: Install Windows dependencies
-        if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Setup Python (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Cache Electron + Plugins
         uses: actions/cache@v4
         with:
           path: |
-            .cache/electron
-            .cache/electron-builder
-            plugins
+            electron-app/.cache/electron
+            electron-app/.cache/electron-builder
+            electron-app/plugins
           key: ${{ runner.os }}-electron-${{ hashFiles('electron-app/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-electron-
 
       - name: Install dependencies
-        working-directory: electron-app
         run: npm ci --no-audit
 
       - name: Download plugins
-        working-directory: electron-app
         run: npm run download:plugins
 
+      # turbo.json encodes that browser-app/electron-app depend on custom-ui
+      # and runs independent build tasks in parallel - no need for three
+      # separate sequential steps.
       - name: Build all workspaces (turbo)
-        working-directory: electron-app
         run: npm run build
         env:
           NODE_OPTIONS: --max_old_space_size=4096
-          THEIA_ALLOW_NATIVE_REBUILD: 1
 
       - name: Prepare plugins
-        run: npm run prepare:plugins --workspace=electron-app
+        run: npm run prepare:plugins
 
       - name: Package application
         env:
@@ -138,13 +125,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: plainscript-${{ matrix.artifact_name }}
-          path: ${{ matrix.artifact_path }}
+          path: electron-app/${{ matrix.artifact_path }}
           retention-days: 30
 
       - name: Publish release artifacts
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.artifact_path }}
+          files: electron-app/${{ matrix.artifact_path }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
