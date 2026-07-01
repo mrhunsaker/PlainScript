@@ -40,4 +40,4 @@ git tag -a "$TAG" -m "Release $TAG"
 git push origin "$TAG"
 
 echo "Created and pushed tag: $TAG"
-echo "This triggers .github/workflows/build-appimage.yml to build artifacts and attach them to the GitHub Release."
+echo "This triggers .github/workflows/release.yml to build artifacts and attach them to the GitHub Release."

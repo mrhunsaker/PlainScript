@@ -100,16 +100,13 @@ jobs:
       - name: Download plugins
         run: npm run download:plugins
 
-      - name: Build custom-ui
-        run: npm run build --workspace=custom-ui
-
-      - name: Build browser-app
-        run: npm run build --workspace=browser-app
-
-      - name: Build electron-app
+      # turbo.json encodes that browser-app/electron-app depend on custom-ui
+      # and runs independent build tasks in parallel - no need for three
+      # separate sequential steps.
+      - name: Build all workspaces (turbo)
+        run: npm run build
         env:
           NODE_OPTIONS: --max_old_space_size=4096
-        run: npm run build --workspace=electron-app
 
       - name: Prepare plugins
         run: npm run prepare:plugins --workspace=electron-app

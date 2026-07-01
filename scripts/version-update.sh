@@ -14,7 +14,11 @@ Description:
 
   By default, creates a git commit, tags as v<version> (from electron-app/package.json),
   and pushes the branch and tag to origin. Use --no-git to skip commit/tag/push.
-  If GH_TOKEN or GITHUB_TOKEN is present, attempts to create a GitHub Release for the new tag.
+
+  Pushing the tag triggers .github/workflows/release.yml, which builds installers
+  for Linux/macOS/Windows and publishes them to a GitHub Release automatically.
+  This script does NOT create the GitHub Release itself, to avoid a race with
+  that workflow and to ensure the release always has build artifacts attached.
 
 Examples:
   ./scripts/version-update.sh            # default: patch
@@ -40,11 +44,9 @@ case "$RAW_BUMP" in
 esac
 
 DO_GIT=1
-CREATE_RELEASE=1
 for arg in "$@"; do
   case "$arg" in
     --no-git) DO_GIT=0 ;;
-    --no-release) CREATE_RELEASE=0 ;;
   esac
 done
 
@@ -171,39 +173,8 @@ if (( DO_GIT == 1 )); then
     git push origin "v${tag_version}" || true
   fi
 
-  # Try to create a GitHub release if token is available
-  if (( CREATE_RELEASE == 1 )); then
-    GH_TOKEN_VAL=${GH_TOKEN:-${GITHUB_TOKEN:-}}
-    if [[ -n "$GH_TOKEN_VAL" ]]; then
-      # Extract owner/repo from origin
-      origin_url=$(git config --get remote.origin.url || true)
-      # Support https and ssh URLs
-      case "$origin_url" in
-        https://github.com/*)
-          repo_path=${origin_url#https://github.com/}
-          repo_path=${repo_path%.git}
-          ;;
-        git@github.com:*)
-          repo_path=${origin_url#git@github.com:}
-          repo_path=${repo_path%.git}
-          ;;
-        *) repo_path="" ;;
-      esac
-
-      if command -v gh >/dev/null 2>&1; then
-        GH_TOKEN="$GH_TOKEN_VAL" gh release create "v${tag_version}" -R "$repo_path" -t "PlainScript ${tag_version}" -n "Automated release for ${tag_version}" || true
-      elif [[ -n "$repo_path" ]]; then
-        api_url="https://api.github.com/repos/${repo_path}/releases"
-        curl -sS -H "Authorization: token $GH_TOKEN_VAL" -H "Content-Type: application/json" \
-          -d '{"tag_name":"v'"${tag_version}"'","name":"PlainScript '"${tag_version}"'","body":"Automated release for '"${tag_version}"'","draft":false,"prerelease":false}' \
-          "$api_url" >/dev/null 2>&1 || true
-      else
-        echo "Could not determine repo for release creation; skipping." >&2
-      fi
-    else
-      echo "No GH_TOKEN/GITHUB_TOKEN set; skipping GitHub release creation." >&2
-    fi
-  fi
+  echo "Pushed tag v${tag_version}."
+  echo "This triggers .github/workflows/release.yml to build artifacts for Linux, macOS, and Windows and publish them to a GitHub Release."
 fi
 
 exit 0

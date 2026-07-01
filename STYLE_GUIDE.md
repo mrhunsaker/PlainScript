@@ -456,4 +456,4 @@ Before committing, verify:
 
 **Last updated**: May 2026  
 **Version**: 1.0  
-**Aligned with**: TypeScript 5.8, Theia 1.67.0, ESLint 9
+**Aligned with**: TypeScript 5.8, Theia 1.73.0, ESLint 9

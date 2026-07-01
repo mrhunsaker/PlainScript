@@ -396,7 +396,7 @@ When reporting bugs, include:
 - npm: 10.5.0
 
 **Steps to reproduce**:
-1. Launch customide-browser
+1. Launch ./scripts/customide-browser.sh
 2. Open a file
 3. Try to close the file
 

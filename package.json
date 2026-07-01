@@ -19,7 +19,7 @@
     "prepare": "husky",
     "postinstall": "node ./scripts/postinstall.js",
     "clean": "turbo run clean && rimraf node_modules",
-    "download:plugins": "theia download:plugins --rate-limit=5 --parallel=false --ignore-errors",
+    "download:plugins": "theia download:plugins --rate-limit=5 --parallel=false --ignore-errors && node ./scripts/verify-plugins.js",
     "clean:all": "bash ./scripts/clean-all.sh",
     "rebuild:all": "bash ./scripts/rebuild-all.sh",
     "release:tag": "bash ./release-tag.sh",

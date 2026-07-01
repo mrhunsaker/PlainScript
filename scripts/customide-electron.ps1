@@ -1,15 +1,20 @@
-@echo off
-REM Custom IDE - Electron Launcher (Windows)
-REM Launches the Theia-based IDE as a native desktop application
+#!/usr/bin/env pwsh
+# Custom IDE - Electron Launcher (Windows)
+# Launches the Theia-based IDE as a native desktop application
 
-cd /d "%~dp0"
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
-echo.
-echo.
-echo 🖥️  Starting Custom IDE (Electron)...
-echo    Desktop application launching...
-echo    Press Ctrl+C to stop
-echo.
+Push-Location (Split-Path -Parent $PSCommandPath)\..
 
-npm run start --workspace=electron-app
-pause
+Write-Host ""
+Write-Host "🖥️  Starting Custom IDE (Electron)..."
+Write-Host "   Desktop application launching..."
+Write-Host "   Press Ctrl+C to stop"
+Write-Host ""
+
+try {
+    npm run start --workspace=electron-app
+} finally {
+    Pop-Location
+}

@@ -128,11 +128,11 @@ PlainScript-specific considerations:
 
 Security updates are provided for:
 
-- **Latest release** (0.x.x): All security patches
-- **Previous minor** (0.(x-1).x): Critical patches only
+- **Latest release**: All security patches
+- **Previous minor**: Critical patches only
 - **Older versions**: Not supported; upgrade recommended
 
-Example: If latest is 1.5.0, security updates provided for 1.5.x and 1.4.x
+Example: If the latest release is 1.2.0, security updates are provided for 1.2.x and 1.1.x.
 
 ## Disclosure Timeline
 

@@ -16,7 +16,7 @@ try {
   );
   // npm 10+ compatible fallback: install package temporarily and run its binary.
   try {
-    execSync('npm exec --yes --package @theia/cli@1.67.0 -- theia check:theia-version', {
+    execSync('npm exec --yes --package @theia/cli@1.73.0 -- theia check:theia-version', {
       stdio: 'inherit',
     });
   } catch (err2) {

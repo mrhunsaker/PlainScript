@@ -21,8 +21,8 @@ with:
   - Full keyboard navigation (no mouse required)
   - Screenreader-friendly UI structure
   - Catppuccin theme family with accessible contrast options
-- **Simple Launch Scripts**: `customide-browser` and `customide-electron` commands (Bash &
-  PowerShell)
+- **Simple Launch Scripts**: `scripts/customide-browser.sh` and `scripts/customide-electron.sh`
+  commands (Bash & PowerShell)
 - **Streamlined UI Layout**:
   - Top-oriented tabs for better navigation structure
   - Files panel only (explorer with clear labeling)
@@ -42,18 +42,24 @@ with:
 ## Project Structure
 
 ```
-customIDE/
-├── customide-browser        # Quick launch script (Bash)
-├── customide-browser.ps1    # Quick launch script (PowerShell)
-├── customide-electron       # Quick launch script (Bash)
-├── customide-electron.ps1   # Quick launch script (PowerShell)
+PlainScript/
+├── scripts/
+│   ├── customide-browser.sh     # Quick launch script (Bash) - browser app
+│   ├── customide-browser.ps1    # Quick launch script (PowerShell) - browser app
+│   ├── customide-electron.sh    # Quick launch script (Bash) - Electron app
+│   ├── customide-electron.ps1   # Quick launch script (PowerShell) - Electron app
+│   └── ...                      # Build, clean, and rebuild helper scripts
 ├── browser-app/             # Browser-based Theia application
 ├── electron-app/            # Electron desktop application
 ├── custom-ui/               # Custom UI plugin with layout & command customizations
 ├── plugins/                 # VSCode extensions (minimal selection)
-├── package.json             # Root monorepo configuration
-├── README.md                # This file
-└── LICENSE                  # Apache 2.0 license
+├── docs/                    # MkDocs documentation source (published to GitHub Pages)
+├── .github/workflows/       # CI, release, and docs-deploy GitHub Actions
+├── mkdocs.yml                # MkDocs site configuration
+├── turbo.json                # Turborepo build pipeline configuration
+├── package.json              # Root monorepo configuration
+├── README.md                 # This file
+└── LICENSE                   # Apache 2.0 license
 ```
 
 ## Prerequisites
@@ -214,17 +220,17 @@ If build succeeds, the IDE is ready.
 Linux/macOS:
 
 ```bash
-./customide-browser    # Launch browser version
+./scripts/customide-browser.sh    # Launch browser version
 # or
-./customide-electron   # Launch Electron version
+./scripts/customide-electron.sh   # Launch Electron version
 ```
 
 Windows (PowerShell):
 
 ```powershell
-.\customide-browser.ps1
+.\scripts\customide-browser.ps1
 # or
-.\customide-electron.ps1
+.\scripts\customide-electron.ps1
 ```
 
 **Option B: Direct npm commands**
@@ -367,7 +373,7 @@ Current selection:
 
 ### Theme & Icon Settings
 
-Both apps use identical settings (aligned to Theia 1.67.0):
+Both apps use identical settings (aligned to Theia 1.73.0):
 
 ```json
 {
@@ -685,18 +691,21 @@ npm install
 npm run bundle --workspace=electron-app
 ```
 
-If persists, check that `electron-app/package.json` specifies `electron: "38.4.0"` (not a newer
-version). Theia 1.67.0 requires Electron 38.x.
+If persists, check that `electron-app/package.json` specifies a matching `electron` version - this
+project currently pins Theia to `1.73.0` (see `@theia/core` in `package.json`) and Electron to
+`39.8.7` (see `electron-app/package.json`). If you've manually bumped one without the other, align
+them back to the versions pinned in those files.
 
 #### Error: "ENOENT: no such file or directory" on scripts
 
-**Cause**: Scripts (`customide-browser`, `customide-electron`) lack execute permissions.
+**Cause**: Launch scripts (`scripts/customide-browser.sh`, `scripts/customide-electron.sh`) lack
+execute permissions.
 
 **Fix**:
 
 ```bash
-chmod +x customide-browser customide-electron
-./customide-browser
+chmod +x scripts/customide-browser.sh scripts/customide-electron.sh
+./scripts/customide-browser.sh
 ```
 
 #### Error: "Port 3000 already in use" (browser app)
@@ -762,40 +771,87 @@ See [PACKAGING.md](./PACKAGING.md) for platform-specific configuration.
 
 ### Automated CI/CD with GitHub Actions
 
-Once you push to GitHub, automated builds trigger on tag push:
+This repo ships three workflows under `.github/workflows/`:
 
-**Workflow** (`.github/workflows/build-appimage.yml`):
+| Workflow      | Trigger                            | What it does                                                                                                      |
+| ------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`      | Push/PR to `main` or `develop`     | Lints, typechecks, runs `npm audit`, and builds all workspace bundles                                             |
+| `release.yml` | Push of a `v*` tag                 | Builds and packages installers for Linux, macOS, and Windows in parallel, then publishes them to a GitHub Release |
+| `docs.yml`    | Push to `main`, push of a `v*` tag | Builds this project's documentation site with MkDocs and deploys it to GitHub Pages                               |
 
-- Builds AppImage on Linux
-- Builds DMG + ZIP on macOS
-- Builds NSIS + Portable EXE on Windows
-- All platforms build in parallel
-- Artifacts appear in GitHub Release
+**`release.yml` produces**:
 
-**To use**:
+- **Linux**: `electron-app/dist/*.AppImage`
+- **macOS**: `electron-app/dist/*.dmg` and `*.zip`
+- **Windows**: `electron-app/dist/*.exe` (NSIS installer + portable)
+
+**To cut a release**:
 
 ```bash
-# Tag and push
-git tag v1.0.0
-git push origin v1.0.0
+# Recommended: use the helper script, which validates the tag format
+# and creates/pushes a vYYYY.MM.DD tag for you
+npm run release:tag
+
+# Equivalent manual steps:
+git tag v2026.06.30
+git push origin v2026.06.30
 
 # GitHub Actions builds all three platforms automatically
-# Check Actions tab for progress
-# Artifacts appear in Release when complete
+# Check the Actions tab for progress
+# Artifacts appear in the GitHub Release when complete, and the docs
+# site is rebuilt/redeployed at the same time
 ```
 
 No manual packaging needed once CI/CD is configured.
+
+> **Note**: `scripts/version-update.sh` is a separate helper that bumps the `version` field across
+> all workspace `package.json` files and tags as `v<semver>` (e.g. `v1.1.18`) instead of a date.
+> Either tag format triggers `release.yml`. `version-update.sh` no longer creates the GitHub Release
+> itself — `release.yml` does that with build artifacts attached, avoiding a race between the two.
+
+### Documentation Site
+
+The full documentation - getting started, architecture, API reference, packaging guide, style guide,
+governance, code of conduct, and security policy - is built with [MkDocs](https://www.mkdocs.org/)
+and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/), and published automatically
+to GitHub Pages at <https://mrhunsaker.github.io/plainscript/> on every push to `main` and every
+tagged release.
+
+Source files live in `docs/` and `mkdocs.yml`. Several pages embed the root-level governance docs
+(`CONTRIBUTING.md`, `STYLE_GUIDE.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
+`GOVERNANCE_ENFORCEMENT.md`, `PACKAGING.md`, `QUICK_REFERENCE.md`) directly via MkDocs snippet
+includes, so those files remain the single source of truth - edit them once and the published site
+picks it up on the next build.
+
+To build or preview the docs locally:
+
+```bash
+npm run docs:install   # pip install -r docs/requirements.txt
+npm run docs:build     # mkdocs build --strict
+npm run docs:serve     # mkdocs serve -a 127.0.0.1:8000
+```
 
 ## Development
 
 **Root** (`npm run <cmd>`):
 
 ```bash
-build               # Build all workspaces (production)
+build               # Build all workspaces (production, via turbo)
 start               # Start browser + Electron simultaneously
 watch               # Watch mode for development (hot reload)
+typecheck           # Type-check custom-ui
+lint                # ESLint across the repo
+lint:fix            # ESLint with --fix
+format              # Format all files with Prettier
+format:check         # Check formatting without modifying files
 download:plugins    # Download configured VSCode extensions
+docs:install        # Install MkDocs + plugins (pip)
+docs:build          # Build the documentation site (mkdocs build --strict)
+docs:serve          # Serve the documentation site locally
 clean               # Remove build artifacts
+clean:all           # Remove build artifacts + node_modules everywhere
+rebuild:all         # clean:all + fresh install + build
+release:tag         # Helper to cut and push a version tag
 ```
 
 **Browser app** (`npm run <cmd> --workspace=browser-app`):
@@ -811,17 +867,28 @@ watch               # Watch and rebuild
 **Electron app** (`npm run <cmd> --workspace=electron-app`):
 
 ```bash
+build               # Production build (rebuild + theia build)
 bundle              # Dev build with watch
-rebuild             # Rebuild for Electron
+rebuild             # Rebuild native modules for Electron
 start               # Launch desktop app
 watch               # Watch and rebuild
+prepare:plugins     # Copy/prepare plugins for packaging
+package             # Full build + prepare:plugins + electron-builder (all targets)
+package:only        # electron-builder only (skip build/prepare steps)
+package:linux       # electron-builder --linux (AppImage)
+package:mac         # electron-builder --mac (dmg + zip)
+package:win         # electron-builder --win (nsis + portable)
 ```
 
 **Custom UI** (`npm run <cmd> --workspace=custom-ui`):
 
 ```bash
 build               # Build Vite bundle + TypeScript defs
-dts                 # Generate type declarations
+watch               # Vite build --watch
+dev                 # Alias for watch
+dts                 # Generate type declarations only
+typecheck           # tsc --noEmit
+clean               # Remove lib/ and node_modules/
 ```
 
 ### Modifying Custom UI
@@ -910,7 +977,7 @@ Both versions are **completely aligned**:
 
 | Aspect            | Browser          | Electron         |
 | ----------------- | ---------------- | ---------------- |
-| Theia Version     | 1.67.0           | 1.67.0           |
+| Theia Version     | 1.73.0           | 1.73.0           |
 | Dependencies      | Identical        | Identical        |
 | Plugins           | Same set         | Same set         |
 | Color Theme       | Catppuccin Latte | Catppuccin Latte |
@@ -1081,8 +1148,9 @@ git push origin feature/your-feature-name
    ```
 
 6. **Set up CI/CD** (optional):
-   - Copy `.github/workflows/build-appimage.yml` to your repo
-   - Push a tag to trigger automated builds
+   - The `.github/workflows/` directory (`ci.yml`, `release.yml`, `docs.yml`) is already included -
+     no extra copying needed once you fork
+   - Push a `v*` tag to trigger automated builds via `release.yml`
 
 7. **Publish**:
    - GitHub Releases (automatic if you use the workflow)
@@ -1170,6 +1238,41 @@ Built with:
 
 ## Changelog
 
+### Unreleased
+
+**CI/CD**:
+
+- Fixed `release.yml` referencing `electron-app` package scripts (`package:linux`, `package:mac`,
+  `package:win`) that didn't exist, which caused every tagged release build to fail
+- Simplified `ci.yml` from 4 jobs to 2: dropped redundant native-toolchain installs and native
+  module compilation from lint/typecheck/audit/build jobs (none of them execute compiled addons),
+  cutting CI time and billed minutes substantially
+- Replaced sequential per-workspace build steps with a single Turborepo-driven `npm run build` in
+  both `ci.yml` and `release.yml`
+- `docs.yml` now also deploys on `v*` tag pushes, not just pushes to `main`
+- Removed the unreachable `*.msi` artifact glob from the Windows release job (the configured target
+  only ever produces `.exe`)
+- `release-tag.sh` and `version-update.sh` no longer reference/duplicate the old release workflow;
+  `version-update.sh` no longer creates its own GitHub Release, avoiding a race with `release.yml`
+
+**Documentation**:
+
+- Wired the existing root-level governance docs (`CONTRIBUTING.md`, `STYLE_GUIDE.md`, `SECURITY.md`,
+  `CODE_OF_CONDUCT.md`, `GOVERNANCE_ENFORCEMENT.md`, `PACKAGING.md`, `QUICK_REFERENCE.md`) into the
+  published MkDocs/GitHub Pages site via snippet includes - they were previously only linked out to
+  GitHub, not part of the built site
+- Fixed several stale references across the docs and this README (wrong launch-script paths, a
+  nonexistent `build-appimage.yml` workflow filename, an outdated Theia version, and an inaccurate
+  claim that `postinstall.js` downloads plugins)
+
+**Scripts**:
+
+- `scripts/customide-browser.ps1` and `scripts/customide-electron.ps1` were batch/cmd scripts
+  wearing a `.ps1` extension (`@echo off`, `REM`) and would fail to run under actual PowerShell;
+  rewritten as real PowerShell
+- `scripts/postinstall.js`'s fallback path checked against a hardcoded stale Theia CLI version
+  (`1.67.0`); now matches the pinned `1.73.0`
+
 ### Version 1.0.0-beta (Initial Public Release - December 14, 2025)
 
 **Core Features**:
@@ -1256,6 +1359,6 @@ A: Check [Theia docs](https://theia-ide.org/docs/),
 
 ---
 
-**Last Updated**: December 14, 2025  
+**Last Updated**: June 30, 2026  
 **License**: Apache 2.0  
 **Maintained by**: PlainScript Community

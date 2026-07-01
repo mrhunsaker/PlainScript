@@ -10,6 +10,7 @@ plugins/**
 !plugins/.gitkeep
 !plugins/README.md
 !plugins/Catppuccin.catppuccin-vsc-icons/**
+!plugins/Catppuccin.catppuccin-vsc/**
 !plugins/oderwat.indent-rainbow/**
 
 # Ignore packaged artifacts and generated plugin copies
