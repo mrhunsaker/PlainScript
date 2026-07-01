@@ -21,28 +21,31 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: linux
-            build_cmd: npm run package:linux
+            build_cmd: npm run package:linux --workspace=electron-app
             artifact_path: dist/*.AppImage
 
           - os: macos-latest
             artifact_name: macos
-            build_cmd: npm run package:mac
+            build_cmd: npm run package:mac --workspace=electron-app
             artifact_path: |
               dist/*.dmg
               dist/*.zip
 
           - os: windows-latest
             artifact_name: windows
-            build_cmd: npm run package:win
+            build_cmd: npm run package:win --workspace=electron-app
             artifact_path: |
               dist/*.exe
 
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
 
-    defaults:
-      run:
-        working-directory: electron-app
+    # NOTE: no global `defaults.run.working-directory` here.
+    # This is an npm-workspaces monorepo (root package.json defines the
+    # "browser-app" / "custom-ui" / "electron-app" workspaces, and the only
+    # package-lock.json lives at the repo root). Every step below runs from
+    # the repo root, exactly like scripts/build-appimage-clean.sh and
+    # ci.yml do. Only the final packaging step is scoped to electron-app.
 
     steps:
       - name: Checkout
@@ -51,9 +54,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: '22'
           cache: npm
-          cache-dependency-path: electron-app/package-lock.json
+          cache-dependency-path: package-lock.json
+
+      - name: Use npm 11
+        run: npm install -g npm@11
 
       - name: Setup Python (Windows)
         if: runner.os == 'Windows'
@@ -94,8 +100,8 @@ jobs:
           path: |
             electron-app/.cache/electron
             electron-app/.cache/electron-builder
-            electron-app/plugins
-          key: ${{ runner.os }}-electron-${{ hashFiles('electron-app/package-lock.json') }}
+            plugins
+          key: ${{ runner.os }}-electron-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-electron-
 
@@ -106,15 +112,15 @@ jobs:
         run: npm run download:plugins
 
       # turbo.json encodes that browser-app/electron-app depend on custom-ui
-      # and runs independent build tasks in parallel - no need for three
-      # separate sequential steps.
+      # and runs independent build tasks in parallel - run from the repo
+      # root so turbo actually sees the full workspace graph.
       - name: Build all workspaces (turbo)
         run: npm run build
         env:
           NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Prepare plugins
-        run: npm run prepare:plugins
+        run: npm run prepare:plugins --workspace=electron-app
 
       - name: Package application
         env:
