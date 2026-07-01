@@ -47,24 +47,21 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
+          node-version: 22 # Must be >= 22.12.0 for @electron/rebuild
           cache: npm
 
-      - name: Setup Python (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
+      # === CRITICAL: Install all system dependencies ===
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-
           sudo apt-get install -y \
             build-essential \
             python3 \
+            python3-pip \
+            python3-dev \
             pkg-config \
+            libssl-dev \
             libsecret-1-dev \
             libx11-dev \
             libxkbfile-dev \
@@ -83,6 +80,22 @@ jobs:
             libgbm-dev \
             p7zip-full
 
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install pkg-config
+          # Xcode command line tools are auto-installed by GitHub Actions
+
+      - name: Install Windows dependencies
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup Python (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Cache Electron + Plugins
         uses: actions/cache@v4
         with:
@@ -100,13 +113,13 @@ jobs:
       - name: Download plugins
         run: npm run download:plugins
 
-      # turbo.json encodes that browser-app/electron-app depend on custom-ui
-      # and runs independent build tasks in parallel - no need for three
-      # separate sequential steps.
+      # Build with native module rebuilds (only in release)
       - name: Build all workspaces (turbo)
         run: npm run build
         env:
           NODE_OPTIONS: --max_old_space_size=4096
+          # Explicitly allow native rebuilds in release
+          THEIA_ALLOW_NATIVE_REBUILD: 1
 
       - name: Prepare plugins
         run: npm run prepare:plugins --workspace=electron-app
