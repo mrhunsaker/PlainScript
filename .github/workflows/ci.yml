@@ -12,16 +12,9 @@ permissions:
 
 env:
   SKIP_THEIA_CHECK: 1
-  # Lifecycle scripts are skipped in every job below via --ignore-scripts,
-  # but HUSKY=0 is a belt-and-suspenders guard in case that ever changes.
   HUSKY: 0
 
 jobs:
-  # Lint, typecheck, npm audit, and the docs-file sanity check all just need
-  # `node_modules` on disk - none of them execute compiled native addons
-  # (keytar/node-pty/drivelist/etc.), so there is no need to apt-get install
-  # native build toolchains or let npm compile those bindings here. That
-  # only has to happen once, at packaging time, in release.yml.
   checks:
     name: Lint, Typecheck & Audit
     runs-on: ubuntu-latest
@@ -33,38 +26,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Debug workspace
-        run: |
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          pwd
-          ls -la
-      - name: Verify workspace
-        run: |
-          pwd
-          ls -la
-          test -f package.json
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
           cache: npm
 
-      - name: Install dependencies (no lifecycle scripts)
-        run: npm ci --no-audit --ignore-scripts
+      - name: Verify workspace structure
+        run: |
+          pwd
+          ls -la
+          test -d browser-app
+          test -d custom-ui
+          test -d electron-app
+          test -f package.json
 
       - name: Install dependencies (no lifecycle scripts)
         run: npm ci --no-audit --ignore-scripts
-      - name: Debug workspace
-        run: |
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          pwd
-          ls -la
-      - name: Verify workspace after install
-        run: |
-          pwd
-          ls -la
-          test -f package.json
-          test -f README.md
 
       - name: Validate docs exist
         run: |
@@ -74,20 +53,14 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: TypeScript checks
-        run: npm run typecheck
+      - name: TypeScript checks - all workspaces
+        run: npm run typecheck --workspaces
 
-      # Advisory only: a high-severity finding shouldn't block CI, but we
-      # surface the outcome in the summary job below.
       - name: Run npm audit
         id: audit
         continue-on-error: true
         run: npm audit --audit-level=high
 
-  # Bundling custom-ui/browser-app/electron-app (theia build -> webpack/esbuild)
-  # is pure JS/TS transpilation - it doesn't touch native bindings either, so
-  # this job skips lifecycle scripts too. Native rebuilds happen only in
-  # release.yml, right before electron-builder packages the app.
   frontend-build:
     name: Build Frontend Bundles
     runs-on: ubuntu-latest
@@ -106,9 +79,6 @@ jobs:
       - name: Install dependencies (no lifecycle scripts)
         run: npm ci --no-audit --ignore-scripts
 
-      # turbo.json already encodes that browser-app/electron-app depend on
-      # custom-ui, and runs independent tasks in parallel - no need to spell
-      # out three separate sequential build steps.
       - name: Build all workspaces (turbo)
         run: npm run build
         env:
@@ -129,7 +99,6 @@ jobs:
     needs:
       - checks
       - frontend-build
-
     if: always()
 
     steps:
@@ -141,7 +110,7 @@ jobs:
 
       - name: Fail if required jobs failed
         run: |
-          if [[ "${{ needs.checks.result }}" != "success" || \
+          if [[ "${{ needs.checks.result }}" != "success" ||
                 "${{ needs.frontend-build.result }}" != "success" ]]; then
             echo "Required CI jobs failed."
             exit 1
