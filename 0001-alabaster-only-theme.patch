@@ -1,0 +1,725 @@
+From f1fac499e69d1b4cc04b9aca54cf471fa4593428 Mon Sep 17 00:00:00 2001
+From: Claude <claude@example.com>
+Date: Thu, 2 Jul 2026 19:29:43 +0000
+Subject: [PATCH] Replace Catppuccin color theme with Alabaster as the sole
+ highlighting theme
+
+- Vendor tonsky.theme-alabaster v0.2.9 into plugins/ in the same
+  unpacked-VSIX layout used for the existing plugins
+- Swap the Catppuccin.catppuccin-vsc theiaPlugins entry for
+  tonsky.theme-alabaster (open-vsx.org)
+- Set workbench.colorTheme to "Alabaster" in both browser-app and
+  electron-app package.json
+- Whitelist plugins/tonsky.theme-alabaster/** in .gitignore in place
+  of the old Catppuccin color-theme entry
+- Update README, GETTING_STARTED, and QUICK_REFERENCE docs to
+  describe Alabaster as the only bundled color theme
+
+The Catppuccin icon theme (file/folder icons) and indent-rainbow
+plugin are unaffected -- this only replaces syntax/color
+highlighting.
+---
+ .gitignore                                    |   2 +-
+ GETTING_STARTED.md                            |   4 +-
+ QUICK_REFERENCE.md                            |   2 +-
+ README.md                                     |  60 ++++---
+ browser-app/package.json                      |   2 +-
+ electron-app/package.json                     |   2 +-
+ package.json                                  |   2 +-
+ .../[Content_Types].xml                       |   2 +
+ .../extension.vsixmanifest                    |  43 +++++
+ .../extension/LICENSE.txt                     |  21 +++
+ .../extension/changelog.md                    |  50 ++++++
+ .../tonsky.theme-alabaster/extension/icon.png | Bin 0 -> 809 bytes
+ .../extension/package.json                    |  39 +++++
+ .../extension/readme.md                       |  75 +++++++++
+ .../theme/alabaster-color-theme.json          | 149 ++++++++++++++++++
+ 15 files changed, 414 insertions(+), 39 deletions(-)
+ create mode 100644 plugins/tonsky.theme-alabaster/[Content_Types].xml
+ create mode 100644 plugins/tonsky.theme-alabaster/extension.vsixmanifest
+ create mode 100644 plugins/tonsky.theme-alabaster/extension/LICENSE.txt
+ create mode 100644 plugins/tonsky.theme-alabaster/extension/changelog.md
+ create mode 100644 plugins/tonsky.theme-alabaster/extension/icon.png
+ create mode 100644 plugins/tonsky.theme-alabaster/extension/package.json
+ create mode 100644 plugins/tonsky.theme-alabaster/extension/readme.md
+ create mode 100644 plugins/tonsky.theme-alabaster/extension/theme/alabaster-color-theme.json
+
+diff --git a/.gitignore b/.gitignore
+index d8fc9f6..b4fe08e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -10,7 +10,7 @@ plugins/**
+ !plugins/.gitkeep
+ !plugins/README.md
+ !plugins/Catppuccin.catppuccin-vsc-icons/**
+-!plugins/Catppuccin.catppuccin-vsc/**
++!plugins/tonsky.theme-alabaster/**
+ !plugins/oderwat.indent-rainbow/**
+ 
+ # Ignore packaged artifacts and generated plugin copies
+diff --git a/GETTING_STARTED.md b/GETTING_STARTED.md
+index e6cfe4a..fa19c44 100644
+--- a/GETTING_STARTED.md
++++ b/GETTING_STARTED.md
+@@ -44,7 +44,7 @@ This downloads all required packages for both browser and Electron versions.
+ npm run download:plugins
+ ```
+ 
+-This fetches the minimal theme and extension set (Alabaster themes, icons, Indent Rainbow).
++This fetches the minimal theme and extension set (Alabaster, icons, Indent Rainbow).
+ 
+ ## Launching the IDE (3 ways)
+ 
+@@ -133,7 +133,7 @@ npm run start         # Launch both versions
+ 4. **Change theme** (optional):
+    - View → Command Palette (F1)
+    - Type "Color Theme"
+-   - Choose Alabaster or Alabaster Dark
++   - "Alabaster" is the only color theme available
+ 
+ ## Keyboard Shortcuts
+ 
+diff --git a/QUICK_REFERENCE.md b/QUICK_REFERENCE.md
+index 1875e41..bb42f95 100644
+--- a/QUICK_REFERENCE.md
++++ b/QUICK_REFERENCE.md
+@@ -99,7 +99,7 @@ npm run download:plugins # Fetch VSCode extensions
+ Edit `browser-app/package.json` and `electron-app/package.json`:
+ 
+ ```json
+-"workbench.colorTheme": "Alabaster Dark"
++"workbench.colorTheme": "Alabaster"
+ ```
+ 
+ Then restart.
+diff --git a/README.md b/README.md
+index dee9e49..2b2dc9b 100644
+--- a/README.md
++++ b/README.md
+@@ -20,7 +20,7 @@ with:
+   - Semantic HTML with proper ARIA labels
+   - Full keyboard navigation (no mouse required)
+   - Screenreader-friendly UI structure
+-  - Catppuccin theme family with accessible contrast options
++  - Alabaster: a single, minimal-highlighting color theme for low visual noise
+ - **Simple Launch Scripts**: `scripts/customide-browser.sh` and `scripts/customide-electron.sh`
+   commands (Bash & PowerShell)
+ - **Streamlined UI Layout**:
+@@ -29,7 +29,7 @@ with:
+   - Locked output panel (always available, not hidden)
+   - No sidebar clutter; single focused work area
+ - **Minimal, Intentional Plugin Ecosystem**: Only 4 VSCode-compatible extensions from Open VSX
+-- **Focused Theme Selection**: Catppuccin color palettes with matching Catppuccin icons
++- **Single Bundled Theme**: Alabaster color theme with matching Catppuccin file icons
+ - **Smart Features**:
+   - Indent Rainbow visualization for code structure
+   - Search-in-workspace functionality
+@@ -270,11 +270,12 @@ Configured in root `package.json` under `theiaPlugins`:
+    - Essential for code intelligence, completion, and debugging
+    - **Why included**: Developers expect syntax support; essential for productivity
+ 
+-2. **Catppuccin Theme** (Catppuccin.catppuccin-vsc)
+-   - Four official Catppuccin palettes: Latte, Frappé, Macchiato, Mocha
+-   - Latte is the default (light)
+-   - **Why included**: cohesive, well-maintained color system; all four variants are WCAG-tested by
+-     the Catppuccin project
++2. **Alabaster Theme** (tonsky.theme-alabaster v0.2.9)
++   - A single light color theme with deliberately minimal syntax highlighting
++   - The only color theme shipped with PlainScript
++   - **Why included**: highlighting only what a parser can identify reliably (strings, constants,
++     comments, definitions) keeps the editor calm and reduces visual noise; standard keywords are
++     left uncolored on purpose
+ 
+ 3. **Catppuccin VSC Icons** (Catppuccin.catppuccin-vsc-icons v1.26.0)
+    - Colorful, semantic file type icons
+@@ -346,8 +347,9 @@ with Tab and arrow keys.
+ 
+ 1. **Semantic HTML**: Proper ARIA labels, roles, and landmarks in custom UI
+ 2. **Keyboard Navigation**: Full IDE control via keyboard; no mouse required
+-3. **High-Contrast Colors**: Catppuccin Latte meets WCAG AA for most UI text; Macchiato and Mocha
+-   offer higher contrast ratios for body text on dark backgrounds
++3. **Low-Noise Highlighting**: Alabaster deliberately colors only strings, constants, comments, and
++   definitions, which keeps contrast high on the tokens that matter and avoids the "fireworks show"
++   of fully-highlighted themes
+ 4. **Clear Focus Indicators**: Visible focus rings on buttons, inputs, tree items
+ 5. **Logical Tab Order**: Files → Editor → Output (top to bottom)
+ 6. **Command Palette**: Accessible via `Ctrl/Cmd+Shift+P`; text-based, no visual-only buttons
+@@ -366,8 +368,7 @@ Configured in root `package.json` under `theiaPlugins`. See
+ Current selection:
+ 
+ - **Eclipse Theia Builtin Extension Pack**: Language servers (JavaScript, Python, Go, Rust, etc.)
+-- **Catppuccin Theme**: Four official palettes (Catppuccin Latte, Catppuccin Frappé, Catppuccin
+-  Macchiato, Catppuccin Mocha)
++- **Alabaster Theme**: The only color theme shipped; light background, minimal syntax highlighting
+ - **Catppuccin VSC Icons**: Semantic file type icons
+ - **Indent Rainbow**: Code structure visualization (auto-enabled)
+ 
+@@ -377,27 +378,19 @@ Both apps use identical settings (aligned to Theia 1.73.0):
+ 
+ ```json
+ {
+-   "workbench.colorTheme": "Catppuccin Latte",
++  "workbench.colorTheme": "Alabaster",
+   "workbench.iconTheme": "Catppuccin VSC Icons - Latte",
+   "security.workspace.trust.enabled": false,
+   "security.workspace.trust.startupPrompt": "never",
+   "extensions.ignoreRecommendations": true,
+   "extensions.verifySignature": false
+ }
+-
+-Valid color theme names:
+-- `Catppuccin Latte`
+-- `Catppuccin Frappé`
+-- `Catppuccin Macchiato`
+-- `Catppuccin Mocha`
+-
+-Recommended icon pairing:
+-- `Catppuccin VSC Icons - Latte` with `Catppuccin Latte`
+-- `Catppuccin VSC Icons - Frappé` with `Catppuccin Frappé`
+-- `Catppuccin VSC Icons - Macchiato` with `Catppuccin Macchiato`
+-- `Catppuccin VSC Icons - Mocha` with `Catppuccin Mocha`
+ ```
+ 
++`Alabaster` is the only color theme bundled with PlainScript — no other color themes are
++downloaded or offered in the Color Theme picker. The icon theme (file/folder icons) is unrelated
++to syntax highlighting and is still provided by Catppuccin VSC Icons.
++
+ Edit in `browser-app/package.json` or `electron-app/package.json` under
+ `theia.frontend.config.preferences`.
+ 
+@@ -530,7 +523,7 @@ This fetches VSCode extensions from Open VSX and stages them in `plugins/`.
+ **Verify**: The `plugins/` directory should contain at least these folders:
+ 
+ - `eclipse-theia.builtin-extension-pack/`
+-- `Catppuccin.catppuccin-vsc/`
++- `tonsky.theme-alabaster/`
+ - `Catppuccin.catppuccin-vsc-icons/`
+ - `oderwat.indent-rainbow/`
+ 
+@@ -980,7 +973,7 @@ Both versions are **completely aligned**:
+ | Theia Version     | 1.73.0           | 1.73.0           |
+ | Dependencies      | Identical        | Identical        |
+ | Plugins           | Same set         | Same set         |
+-| Color Theme       | Catppuccin Latte | Catppuccin Latte |
++| Color Theme       | Alabaster        | Alabaster        |
+ | Icon Theme        | Catppuccin       | Catppuccin       |
+ | UI Layout         | Custom           | Custom           |
+ | Preferences       | Identical        | Identical        |
+@@ -1012,8 +1005,9 @@ For errors during `npm install`, `npm run download:plugins`, or `npm run build`,
+ 
+ #### Theme Not Applying
+ 
+-- Confirm Catppuccin theme is downloaded: `npm run download:plugins`
+-- Manually select theme: `Ctrl/Cmd+Shift+P` → "Color Theme" → choose from list
++- Confirm the Alabaster theme is downloaded: `npm run download:plugins` (or check that
++  `plugins/tonsky.theme-alabaster/` exists)
++- Manually select theme: `Ctrl/Cmd+Shift+P` → "Color Theme" → choose "Alabaster" (the only option)
+ - Check Preferences > Workbench: Color Theme setting
+ - Restart the app
+ 
+@@ -1292,7 +1286,7 @@ Built with:
+ **Plugins & Theming**:
+ 
+ - 4 carefully selected plugins (language support, theme, icons)
+-- Catppuccin Latte (default), Frappé, Macchiato, and Mocha
++- Alabaster — the only color theme, minimal syntax highlighting
+ - Catppuccin semantic icons
+ - Indent Rainbow visualization
+ 
+@@ -1334,9 +1328,11 @@ A: Yes! Edit files in `custom-ui/src/frontend/` and rebuild with
+ `npm run build --workspace=custom-ui`.
+ 
+ **Q: How do I change the theme or colors?**  
+-A: Themes are provided by the Catppuccin plugin. Switch via Preferences > Color Theme using
+-Catppuccin Latte, Frappé, Macchiato, or Mocha. To create a custom theme, write a new VS Code
+-extension.
++A: PlainScript intentionally ships only one color theme, Alabaster, provided by the
++`tonsky.theme-alabaster` plugin. To use a different theme, add its extension to `theiaPlugins` in
++root `package.json`, run `npm run download:plugins`, then set `workbench.colorTheme` in
++`browser-app/package.json` and `electron-app/package.json`. To create a fully custom theme, write a
++new VS Code color theme extension and add it the same way.
+ 
+ **Q: Will my custom IDE work on Windows/macOS?**  
+ A: Yes! Use GitHub Actions CI/CD to build for all platforms. See [PACKAGING.md](./PACKAGING.md).
+diff --git a/browser-app/package.json b/browser-app/package.json
+index 3cc1c2b..88a82bf 100644
+--- a/browser-app/package.json
++++ b/browser-app/package.json
+@@ -38,7 +38,7 @@
+         "reloadOnReconnect": true,
+         "preferences": {
+           "workbench.iconTheme": "Catppuccin VSC Icons - Latte",
+-          "workbench.colorTheme": "Catppuccin Latte",
++          "workbench.colorTheme": "Alabaster",
+           "security.workspace.trust.enabled": false,
+           "security.workspace.trust.startupPrompt": "never",
+           "security.workspace.trust.emptyWindowTrust": "trusted",
+diff --git a/electron-app/package.json b/electron-app/package.json
+index 8e81960..207af5f 100644
+--- a/electron-app/package.json
++++ b/electron-app/package.json
+@@ -54,7 +54,7 @@
+         "reloadOnReconnect": true,
+         "preferences": {
+           "workbench.iconTheme": "Catppuccin VSC Icons - Latte",
+-          "workbench.colorTheme": "Catppuccin Latte",
++          "workbench.colorTheme": "Alabaster",
+           "security.workspace.trust.enabled": false,
+           "security.workspace.trust.startupPrompt": "never",
+           "security.workspace.trust.emptyWindowTrust": "trusted",
+diff --git a/package.json b/package.json
+index 353d149..99c7bca 100644
+--- a/package.json
++++ b/package.json
+@@ -60,7 +60,7 @@
+   "theiaPlugins": {
+     "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.95.3/file/eclipse-theia.builtin-extension-pack-1.95.3.vsix",
+     "Catppuccin.catppuccin-vsc-icons": "https://open-vsx.org/api/Catppuccin/catppuccin-vsc-icons/1.26.0/file/Catppuccin.catppuccin-vsc-icons-1.26.0.vsix",
+-    "Catppuccin.catppuccin-vsc": "https://open-vsx.org/api/Catppuccin/catppuccin-vsc/3.19.0/file/Catppuccin.catppuccin-vsc-3.19.0.vsix",
++    "tonsky.theme-alabaster": "https://open-vsx.org/api/tonsky/theme-alabaster/0.2.9/file/tonsky.theme-alabaster-0.2.9.vsix",
+     "oderwat.indent-rainbow": "https://open-vsx.org/api/oderwat/indent-rainbow/8.3.1/file/oderwat.indent-rainbow-8.3.1.vsix"
+   },
+   "devDependencies": {
+diff --git a/plugins/tonsky.theme-alabaster/[Content_Types].xml b/plugins/tonsky.theme-alabaster/[Content_Types].xml
+new file mode 100644
+index 0000000..0f455aa
+--- /dev/null
++++ b/plugins/tonsky.theme-alabaster/[Content_Types].xml
+@@ -0,0 +1,2 @@
++<?xml version="1.0" encoding="utf-8"?>
++<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension=".json" ContentType="application/json"/><Default Extension=".md" ContentType="text/markdown"/><Default Extension=".png" ContentType="image/png"/><Default Extension=".txt" ContentType="text/plain"/><Default Extension=".vsixmanifest" ContentType="text/xml"/></Types>
+diff --git a/plugins/tonsky.theme-alabaster/extension.vsixmanifest b/plugins/tonsky.theme-alabaster/extension.vsixmanifest
+new file mode 100644
+index 0000000..082ec6d
+--- /dev/null
++++ b/plugins/tonsky.theme-alabaster/extension.vsixmanifest
+@@ -0,0 +1,43 @@
++<?xml version="1.0" encoding="utf-8"?>
++	<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
++		<Metadata>
++			<Identity Language="en-US" Id="theme-alabaster" Version="0.2.9" Publisher="tonsky" />
++			<DisplayName>Alabaster Theme</DisplayName>
++			<Description xml:space="preserve">A light theme with minimal amount of highlighting</Description>
++			<Tags>theme,color-theme,light,minimal,__web_extension</Tags>
++			<Categories>Themes</Categories>
++			<GalleryFlags>Public</GalleryFlags>
++
++			<Properties>
++				<Property Id="Microsoft.VisualStudio.Code.Engine" Value="^1.12.0" />
++				<Property Id="Microsoft.VisualStudio.Code.ExtensionDependencies" Value="" />
++				<Property Id="Microsoft.VisualStudio.Code.ExtensionPack" Value="" />
++				<Property Id="Microsoft.VisualStudio.Code.ExtensionKind" Value="ui,workspace,web" />
++				<Property Id="Microsoft.VisualStudio.Code.LocalizedLanguages" Value="" />
++				<Property Id="Microsoft.VisualStudio.Code.EnabledApiProposals" Value="" />
++
++				<Property Id="Microsoft.VisualStudio.Code.ExecutesCode" Value="false" />
++				<Property Id="Microsoft.VisualStudio.Services.Links.Source" Value="https://github.com/tonsky/vscode-theme-alabaster.git" />
++				<Property Id="Microsoft.VisualStudio.Services.Links.Getstarted" Value="https://github.com/tonsky/vscode-theme-alabaster.git" />
++				<Property Id="Microsoft.VisualStudio.Services.Links.GitHub" Value="https://github.com/tonsky/vscode-theme-alabaster.git" />
++				<Property Id="Microsoft.VisualStudio.Services.Links.Support" Value="https://github.com/tonsky/vscode-theme-alabaster/issues" />
++				<Property Id="Microsoft.VisualStudio.Services.Links.Learn" Value="https://github.com/tonsky/vscode-theme-alabaster#readme" />
++
++				<Property Id="Microsoft.VisualStudio.Services.GitHubFlavoredMarkdown" Value="true" />
++				<Property Id="Microsoft.VisualStudio.Services.Content.Pricing" Value="Free"/>
++			</Properties>
++			<License>extension/LICENSE.txt</License>
++			<Icon>extension/icon.png</Icon>
++		</Metadata>
++		<Installation>
++			<InstallationTarget Id="Microsoft.VisualStudio.Code"/>
++		</Installation>
++		<Dependencies/>
++		<Assets>
++			<Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="extension/package.json" Addressable="true" />
++			<Asset Type="Microsoft.VisualStudio.Services.Content.Details" Path="extension/readme.md" Addressable="true" />
++<Asset Type="Microsoft.VisualStudio.Services.Content.Changelog" Path="extension/changelog.md" Addressable="true" />
++<Asset Type="Microsoft.VisualStudio.Services.Content.License" Path="extension/LICENSE.txt" Addressable="true" />
++<Asset Type="Microsoft.VisualStudio.Services.Icons.Default" Path="extension/icon.png" Addressable="true" />
++		</Assets>
++	</PackageManifest>
+diff --git a/plugins/tonsky.theme-alabaster/extension/LICENSE.txt b/plugins/tonsky.theme-alabaster/extension/LICENSE.txt
+new file mode 100644
+index 0000000..1f752fb
+--- /dev/null
++++ b/plugins/tonsky.theme-alabaster/extension/LICENSE.txt
+@@ -0,0 +1,21 @@
++The MIT License (MIT)
++
++Copyright (c) 2017 Nikita Prokopov
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/plugins/tonsky.theme-alabaster/extension/changelog.md b/plugins/tonsky.theme-alabaster/extension/changelog.md
+new file mode 100644
+index 0000000..08a8332
+--- /dev/null
++++ b/plugins/tonsky.theme-alabaster/extension/changelog.md
+@@ -0,0 +1,50 @@
++# 0.2.9
++
++- Selection highlight background is opaque #24 thx @dziaineka
++
++# 0.2.8
++
++- Consistent colors in panels #23 thx @dziaineka
++
++# 0.2.7
++
++- fixed visibility in suggest widget #22 thx @dziaineka
++
++# 0.2.6
++
++- Fix Quick Pick & suggest widget colors #20 thx @artelkr
++
++# 0.2.5
++
++- #000 black for default text
++- Custom status bar colors for debugging and noFolder states
++
++# 0.2.4
++
++- Slightly darker tabs background (#9)
++
++# 0.2.3
++
++- Grey status bar (#8)
++
++# 0.2.2
++
++- Terminal colors (#6)
++
++# 0.2.1
++
++- Changelog for 0.2.0 :)
++
++# 0.2.0
++
++- Upgraded color codes for VS Code 1.12.0
++- Default status bar color
++- Light background for actity bar
++
++# 0.1.1
++
++- Updated README
++
++# 0.1.0
++
++- Initial release
+\ No newline at end of file
+diff --git a/plugins/tonsky.theme-alabaster/extension/icon.png b/plugins/tonsky.theme-alabaster/extension/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..3c76359c2f209c26a5a462cf049ebc28fcd5bf50
+GIT binary patch
+literal 809
+zcmeAS@N?(olHy`uVBq!ia0vp^CqS5k4M?tyST_$yaTa()7Bet#3xhBt!>l<HKtaah
+zAa^H*b?0PW0y!+{j=qiz3>*8o|0J?9Ffi@&ba4!+V0?SoFiV6{qV3_GV^Px9+WiZU
+zPhhoe=-oP(J%B@LNr|IC%*KmO(i=OJbdr*{Pg0w7uQr%x^4ys=M}z;@f86W7`|dlL
+zANv<u+H!~cDhRMJITA&%v448>&36V*qk{kk3ofGNB<rWIPYr#JJz;886~?Nr<zVBT
+z+9GDXuRop~Oi>o#U{@F5U}{vrPFy#eFuDKy!yx&6d*|k`EM{Z!R>Q8anYps!xunmn
+z-{J8rOuso;nj93c6Nem`cUtfTZ?pYdyTc*jBzE5?7AS0gw>Pm-&i1d(&5K+tjX<A3
+zk&6P8V26VMCOTot{iNb=Gi%lNm)BF=tykkSeDzf>x2-pG2)J|&^UeynV_WX#J(uRt
+znTg#)JbX|7e65wZdh=zJ!iIkAYQO<;#%jXm_t_Fx@7vqsF%El};S5ZYBo5hYxBK~t
+T{-5g$OxX;cu6{1-oD!M<0cG2S
+
+literal 0
+HcmV?d00001
+
+diff --git a/plugins/tonsky.theme-alabaster/extension/package.json b/plugins/tonsky.theme-alabaster/extension/package.json
+new file mode 100644
+index 0000000..24a7b8e
+--- /dev/null
++++ b/plugins/tonsky.theme-alabaster/extension/package.json
+@@ -0,0 +1,39 @@
++{
++	"name": "theme-alabaster",
++	"description": "A light theme with minimal amount of highlighting",
++	"displayName": "Alabaster Theme",
++	"version": "0.2.9",
++	"publisher": "tonsky",
++	"license": "MIT",
++	"maintainers": [
++		"Nikita Prokopov <prokopov@gmail.com>"
++	],
++	"engines": {
++		"vscode": "^1.12.0"
++	},
++	"categories": [
++		"Themes"
++	],
++	"contributes": {
++		"themes": [
++			{
++				"label": "Alabaster",
++				"uiTheme": "vs",
++				"path": "./theme/alabaster-color-theme.json"
++			}
++		]
++	},
++	"icon": "icon.png",
++	"repository": {
++		"type": "git",
++		"url": "https://github.com/tonsky/vscode-theme-alabaster.git"
++	},
++	"bugs": {
++		"url": "https://github.com/tonsky/vscode-theme-alabaster/issues"
++	},
++	"__metadata": {
++		"id": "c629b26b-49e4-4995-ba6e-5d083752f3d6",
++		"publisherDisplayName": "Nikita Prokopov",
++		"publisherId": "8fe0f11e-8bd6-4cf2-9ee6-acead847e970"
++	}
++}
+diff --git a/plugins/tonsky.theme-alabaster/extension/readme.md b/plugins/tonsky.theme-alabaster/extension/readme.md
+new file mode 100644
+index 0000000..6c2416e
+--- /dev/null
++++ b/plugins/tonsky.theme-alabaster/extension/readme.md
+@@ -0,0 +1,75 @@
++# Alabaster Theme
++
++A light theme with minimal amount of highlighting for [Visual Studio Code](http://code.visualstudio.com).
++
++## Motivation
++
++Most color themes highlight everything they can, ending up looking like a fireworks show.
++
++Instead, Alabaster uses minimal highlighting; it defines just four classes:
++
++  1. Strings
++  2. All statically known constants (numbers, symbols, user-defined keywords, boolean values)
++  3. Comments
++  4. Global definitions
++
++Additionally:
++
++- Alabaster does not highlight standard language keywords (if, else, function, etc). They are usually least important and most obvious part of any program.
++
++- Alabaster highlights comments. Most themes try to dim comments by using low-contrast greys. I think if code was complex enough that it deserved an explanation then it’s that explanation we should see and read first. It would be a crime to hide it.
++
++- Alabaster doesn’t use font variations. It’s hard to scan code when it jumps between normal, **bold** and *italics* all the time. Also, not all fonts provide bold/italics variants.
++
++- Having minimal amount of rules means you can consciously use them to look for the exact piece of information you need. Most other “fireworks” themes provide only one meaningful contribution: if it’s colored it’s probably syntactically correct. Instead, in Alabaster you can actually remember all the rules, and e.g. if you need to look for a string you know that you’re looking for a green token. And all the strings really pop out because there are not many other things highlighted.
++
++- Alabaster only highlights things that parser could identify reliably. I believe that if highlighting works only partially then it does more harm than good. When highlighting works reliably, your brain learns to rely on it. When it’s not reliable, your brain spends precious brain cycles to re-check everything it sees on the screen.
++
++![Screenshot](https://raw.githubusercontent.com/tonsky/vscode-theme-alabaster/master/screenshot.png)
++
++## What our users [are saying](https://marketplace.visualstudio.com/items?itemName=tonsky.theme-alabaster&ssr=false#review-details)?
++
++> It's like I had this weight on my eyes, and now it's gone. Awesome!
++
++– Alex Sugak ★★★★★
++
++> After your theme others looks like unreadable neon things 🤯
++
++– lamartire ★★★★★
++
++> Minimalistic cool
++
++– denisgrib ★★★★★
++
++> Super minimal and undistracting. Easy to read.
++
++– Josh Bernitt ★★★★★
++
++> A little bit confusing at first if you're from The Dark Land. But then you just chill.
++
++– aenor.realm ★★★★★
++
++## Install
++
++1. Go to `Extensions`
++2. Search for `alabaster`
++3. Install
++
++Or alternatively open the extension webpage in browser and install from there: https://marketplace.visualstudio.com/items?itemName=tonsky.theme-alabaster
++
++## License
++
++[MIT License](https://github.com/tonsky/vscode-theme-alabaster/blob/master/./LICENSE.txt)
++
++## Variations
++
++- Dark for VS Code [apust/vscode-rubber-theme](https://github.com/apust/vscode-rubber-theme)
++- Dark for VS Code (closer to the original ST version)
++  [gargakshit/vscode-theme-alabaster-dark](https://github.com/gargakshit/vscode-theme-alabaster-dark)
++- Light for VS Code (closer to JetBrains IDEs version) [atrskv/vscode-theme-alabaster](https://github.com/atrskv/vscode-theme-alabaster)
++- for Sublime Text 3 [tonsky/sublime-scheme-alabaster](https://github.com/tonsky/sublime-scheme-alabaster)
++- for JetBrains IDEs (IntelliJ IDEA etc) [tonsky/intellij-alabaster](https://github.com/tonsky/intellij-alabaster)
++- for JetBrains IDEs as a plugin [vlnabatov/alabaster-theme](https://github.com/vlnabatov/alabaster-theme)
++- for JetBrains IDEs as a plugin (dark version) [vlnabatov/alabaster-dark-theme](https://github.com/vlnabatov/alabaster-dark-theme)
++- for Sublime Text 2 (unofficial) [freetonik/Travertine](https://github.com/freetonik/Travertine)
++- Original version for LightTable [tonsky/alabaster-lighttable-skin](https://github.com/tonsky/alabaster-lighttable-skin)
+diff --git a/plugins/tonsky.theme-alabaster/extension/theme/alabaster-color-theme.json b/plugins/tonsky.theme-alabaster/extension/theme/alabaster-color-theme.json
+new file mode 100644
+index 0000000..a37e1e9
+--- /dev/null
++++ b/plugins/tonsky.theme-alabaster/extension/theme/alabaster-color-theme.json
+@@ -0,0 +1,149 @@
++{
++	"$schema": "vscode://schemas/color-theme",
++	"name": "Alabaster",
++	"tokenColors": [
++		{
++			"name": "Comments",
++			"scope": [
++				"comment",
++				"punctuation.definition.comment"
++			],
++			"settings": {
++				"foreground": "#AA3731"
++			}
++		},
++		{
++			"name": "Strings",
++			"scope": [
++				"string",
++				"string.regexp",
++				"constant.other.symbol"
++			],
++			"settings": {
++				"foreground": "#448C27"
++			}
++		},
++		{
++			"name": "Strings: Escape Sequences",
++			"scope": "constant.character.escape",
++			"settings": {
++				"foreground": "#777777"
++			}
++		},
++		{
++			"name": "Numbers, Characters",
++			"scope": [
++				"constant.numeric",
++				"constant.character",
++				"constant.keyword",
++				"constant"
++			],
++			"settings": {
++				"foreground": "#7A3E9D"
++			}
++		},
++		{
++			"name": "Global definitions",
++			"scope": "entity.name",
++			"settings": {
++				"foreground": "#325CC0"
++			}
++		},
++		{
++			"name": "Punctuation",
++			"scope": "punctuation",
++			"settings": {
++				"foreground": "#777777"
++			}
++		},
++		{
++			"name": "Invalid",
++			"scope": "invalid",
++			"settings": {
++				"background": "#96000014",
++				"foreground": "#660000"
++			}
++		},
++		{
++			"name": "Extra: Diff Range",
++			"scope": [
++				"meta.diff.range",
++				"meta.diff.index",
++				"meta.separator"
++			],
++			"settings": {
++				"background": "#DDDDFF",
++				"foreground": "#434343"
++			}
++		},
++		{
++			"name": "Extra: Diff From",
++			"scope": "meta.diff.header.from-file",
++			"settings": {
++				"background": "#FFDDDD",
++				"foreground": "#434343"
++			}
++		},
++		{
++			"name": "Extra: Diff To",
++			"scope": "meta.diff.header.to-file",
++			"settings": {
++				"background": "#DDFFDD",
++				"foreground": "#434343"
++			}
++		}
++	],
++	"colors": {
++		"editor.background": "#F7F7F7",
++		"editor.foreground": "#000",
++		"editor.lineHighlightBackground": "#F0F0F0",
++		"editor.selectionBackground": "#BFDBFE",
++		"editor.selectionHighlightBackground": "#CFCFCF81",
++		"panel.background": "#F0F0F0",
++		"sideBar.background": "#F0F0F0",
++		"editorGroupHeader.tabsBackground": "#F0F0F0",
++		"activityBar.background": "#F0F0F0",
++		"activityBar.foreground": "#007ACC",
++		"editorLineNumber.foreground": "#9DA39A",
++		"editorCursor.foreground": "#007ACC",
++		"editor.findMatchBackground": "#FFBC5D",
++		"editor.findMatchHighlightBackground": "#FFD86381",
++		"statusBar.background": "#DDDDDD",
++		"statusBar.foreground": "#474747",
++		"statusBar.debuggingBackground": "#FFBC5D",
++		"statusBar.debuggingForeground": "#000",
++		"statusBar.noFolderBackground": "#7A3E9D",
++		"statusBar.noFolderForeground": "#fff",
++
++		"list.activeSelectionBackground": "#DDDDDD",
++		"list.activeSelectionForeground": "#000000",
++		"list.inactiveSelectionBackground": "#E6E6E6",
++		"list.focusHighlightForeground": "#007ACC",
++		"focusBorder": "#CCCCCC",
++
++		"quickInputList.focusForeground": "#000000",
++		"quickInputList.focusBackground": "#DDDDDD",
++
++		"editorSuggestWidget.selectedBackground": "#DDDDDD",
++		"editorSuggestWidget.focusHighlightForeground": "#000000",
++		"editorSuggestWidget.highlightForeground": "#000000",
++		"editorSuggestWidget.selectedForeground": "#000000",
++
++		"terminal.ansiWhite": "#BBBBBB",
++		"terminal.ansiBlack": "#000000",
++		"terminal.ansiBlue": "#325CC0",
++		"terminal.ansiCyan": "#0083B2",
++		"terminal.ansiGreen": "#448C27",
++		"terminal.ansiMagenta": "#7A3E9D",
++		"terminal.ansiRed": "#AA3731",
++		"terminal.ansiYellow": "#CB9000",
++		"terminal.ansiBrightWhite": "#FFFFFF",
++		"terminal.ansiBrightBlack": "#777777",
++		"terminal.ansiBrightBlue": "#007ACC",
++		"terminal.ansiBrightCyan": "#00AACB",
++		"terminal.ansiBrightGreen": "#60CB00",
++		"terminal.ansiBrightMagenta": "#E64CE6",
++		"terminal.ansiBrightRed": "#F05050",
++		"terminal.ansiBrightYellow": "#FFBC5D"
++	}
++}
+-- 
+2.43.0
+
