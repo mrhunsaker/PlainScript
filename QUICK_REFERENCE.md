@@ -99,7 +99,7 @@ npm run download:plugins # Fetch VSCode extensions
 Edit `browser-app/package.json` and `electron-app/package.json`:
 
 ```json
-"workbench.colorTheme": "Alabaster Dark"
+"workbench.colorTheme": "Alabaster"
 ```
 
 Then restart.

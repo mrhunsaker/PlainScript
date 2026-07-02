@@ -20,7 +20,7 @@ with:
   - Semantic HTML with proper ARIA labels
   - Full keyboard navigation (no mouse required)
   - Screenreader-friendly UI structure
-  - Catppuccin theme family with accessible contrast options
+  - Alabaster: a single, minimal-highlighting color theme for low visual noise
 - **Simple Launch Scripts**: `scripts/customide-browser.sh` and `scripts/customide-electron.sh`
   commands (Bash & PowerShell)
 - **Streamlined UI Layout**:
@@ -29,7 +29,7 @@ with:
   - Locked output panel (always available, not hidden)
   - No sidebar clutter; single focused work area
 - **Minimal, Intentional Plugin Ecosystem**: Only 4 VSCode-compatible extensions from Open VSX
-- **Focused Theme Selection**: Catppuccin color palettes with matching Catppuccin icons
+- **Single Bundled Theme**: Alabaster color theme with matching Catppuccin file icons
 - **Smart Features**:
   - Indent Rainbow visualization for code structure
   - Search-in-workspace functionality
@@ -270,11 +270,12 @@ Configured in root `package.json` under `theiaPlugins`:
    - Essential for code intelligence, completion, and debugging
    - **Why included**: Developers expect syntax support; essential for productivity
 
-2. **Catppuccin Theme** (Catppuccin.catppuccin-vsc)
-   - Four official Catppuccin palettes: Latte, Frappé, Macchiato, Mocha
-   - Latte is the default (light)
-   - **Why included**: cohesive, well-maintained color system; all four variants are WCAG-tested by
-     the Catppuccin project
+2. **Alabaster Theme** (tonsky.theme-alabaster v0.2.9)
+   - A single light color theme with deliberately minimal syntax highlighting
+   - The only color theme shipped with PlainScript
+   - **Why included**: highlighting only what a parser can identify reliably (strings, constants,
+     comments, definitions) keeps the editor calm and reduces visual noise; standard keywords are
+     left uncolored on purpose
 
 3. **Catppuccin VSC Icons** (Catppuccin.catppuccin-vsc-icons v1.26.0)
    - Colorful, semantic file type icons
@@ -346,8 +347,9 @@ with Tab and arrow keys.
 
 1. **Semantic HTML**: Proper ARIA labels, roles, and landmarks in custom UI
 2. **Keyboard Navigation**: Full IDE control via keyboard; no mouse required
-3. **High-Contrast Colors**: Catppuccin Latte meets WCAG AA for most UI text; Macchiato and Mocha
-   offer higher contrast ratios for body text on dark backgrounds
+3. **Low-Noise Highlighting**: Alabaster deliberately colors only strings, constants, comments, and
+   definitions, which keeps contrast high on the tokens that matter and avoids the "fireworks show"
+   of fully-highlighted themes
 4. **Clear Focus Indicators**: Visible focus rings on buttons, inputs, tree items
 5. **Logical Tab Order**: Files → Editor → Output (top to bottom)
 6. **Command Palette**: Accessible via `Ctrl/Cmd+Shift+P`; text-based, no visual-only buttons
@@ -366,8 +368,7 @@ Configured in root `package.json` under `theiaPlugins`. See
 Current selection:
 
 - **Eclipse Theia Builtin Extension Pack**: Language servers (JavaScript, Python, Go, Rust, etc.)
-- **Catppuccin Theme**: Four official palettes (Catppuccin Latte, Catppuccin Frappé, Catppuccin
-  Macchiato, Catppuccin Mocha)
+- **Alabaster Theme**: The only color theme shipped; light background, minimal syntax highlighting
 - **Catppuccin VSC Icons**: Semantic file type icons
 - **Indent Rainbow**: Code structure visualization (auto-enabled)
 
@@ -377,26 +378,18 @@ Both apps use identical settings (aligned to Theia 1.73.0):
 
 ```json
 {
-   "workbench.colorTheme": "Catppuccin Latte",
+  "workbench.colorTheme": "Alabaster",
   "workbench.iconTheme": "Catppuccin VSC Icons - Latte",
   "security.workspace.trust.enabled": false,
   "security.workspace.trust.startupPrompt": "never",
   "extensions.ignoreRecommendations": true,
   "extensions.verifySignature": false
 }
-
-Valid color theme names:
-- `Catppuccin Latte`
-- `Catppuccin Frappé`
-- `Catppuccin Macchiato`
-- `Catppuccin Mocha`
-
-Recommended icon pairing:
-- `Catppuccin VSC Icons - Latte` with `Catppuccin Latte`
-- `Catppuccin VSC Icons - Frappé` with `Catppuccin Frappé`
-- `Catppuccin VSC Icons - Macchiato` with `Catppuccin Macchiato`
-- `Catppuccin VSC Icons - Mocha` with `Catppuccin Mocha`
 ```
+
+`Alabaster` is the only color theme bundled with PlainScript — no other color themes are
+downloaded or offered in the Color Theme picker. The icon theme (file/folder icons) is unrelated
+to syntax highlighting and is still provided by Catppuccin VSC Icons.
 
 Edit in `browser-app/package.json` or `electron-app/package.json` under
 `theia.frontend.config.preferences`.
@@ -530,7 +523,7 @@ This fetches VSCode extensions from Open VSX and stages them in `plugins/`.
 **Verify**: The `plugins/` directory should contain at least these folders:
 
 - `eclipse-theia.builtin-extension-pack/`
-- `Catppuccin.catppuccin-vsc/`
+- `tonsky.theme-alabaster/`
 - `Catppuccin.catppuccin-vsc-icons/`
 - `oderwat.indent-rainbow/`
 
@@ -980,7 +973,7 @@ Both versions are **completely aligned**:
 | Theia Version     | 1.73.0           | 1.73.0           |
 | Dependencies      | Identical        | Identical        |
 | Plugins           | Same set         | Same set         |
-| Color Theme       | Catppuccin Latte | Catppuccin Latte |
+| Color Theme       | Alabaster        | Alabaster        |
 | Icon Theme        | Catppuccin       | Catppuccin       |
 | UI Layout         | Custom           | Custom           |
 | Preferences       | Identical        | Identical        |
@@ -1012,8 +1005,9 @@ For errors during `npm install`, `npm run download:plugins`, or `npm run build`,
 
 #### Theme Not Applying
 
-- Confirm Catppuccin theme is downloaded: `npm run download:plugins`
-- Manually select theme: `Ctrl/Cmd+Shift+P` → "Color Theme" → choose from list
+- Confirm the Alabaster theme is downloaded: `npm run download:plugins` (or check that
+  `plugins/tonsky.theme-alabaster/` exists)
+- Manually select theme: `Ctrl/Cmd+Shift+P` → "Color Theme" → choose "Alabaster" (the only option)
 - Check Preferences > Workbench: Color Theme setting
 - Restart the app
 
@@ -1292,7 +1286,7 @@ Built with:
 **Plugins & Theming**:
 
 - 4 carefully selected plugins (language support, theme, icons)
-- Catppuccin Latte (default), Frappé, Macchiato, and Mocha
+- Alabaster — the only color theme, minimal syntax highlighting
 - Catppuccin semantic icons
 - Indent Rainbow visualization
 
@@ -1334,9 +1328,11 @@ A: Yes! Edit files in `custom-ui/src/frontend/` and rebuild with
 `npm run build --workspace=custom-ui`.
 
 **Q: How do I change the theme or colors?**  
-A: Themes are provided by the Catppuccin plugin. Switch via Preferences > Color Theme using
-Catppuccin Latte, Frappé, Macchiato, or Mocha. To create a custom theme, write a new VS Code
-extension.
+A: PlainScript intentionally ships only one color theme, Alabaster, provided by the
+`tonsky.theme-alabaster` plugin. To use a different theme, add its extension to `theiaPlugins` in
+root `package.json`, run `npm run download:plugins`, then set `workbench.colorTheme` in
+`browser-app/package.json` and `electron-app/package.json`. To create a fully custom theme, write a
+new VS Code color theme extension and add it the same way.
 
 **Q: Will my custom IDE work on Windows/macOS?**  
 A: Yes! Use GitHub Actions CI/CD to build for all platforms. See [PACKAGING.md](./PACKAGING.md).

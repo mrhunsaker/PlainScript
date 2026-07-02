@@ -44,7 +44,7 @@ This downloads all required packages for both browser and Electron versions.
 npm run download:plugins
 ```
 
-This fetches the minimal theme and extension set (Alabaster themes, icons, Indent Rainbow).
+This fetches the minimal theme and extension set (Alabaster, icons, Indent Rainbow).
 
 ## Launching the IDE (3 ways)
 
@@ -133,7 +133,7 @@ npm run start         # Launch both versions
 4. **Change theme** (optional):
    - View → Command Palette (F1)
    - Type "Color Theme"
-   - Choose Alabaster or Alabaster Dark
+   - "Alabaster" is the only color theme available
 
 ## Keyboard Shortcuts
 
